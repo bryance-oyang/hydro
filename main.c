@@ -1,3 +1,8 @@
+#ifdef CDEBUG
+#define _GNU_SOURCE
+#include <fenv.h>
+#endif /* CDEBUG */
+
 #include "hydro.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,6 +30,22 @@ void output_array(char *filename, double *q, int nx, int ny)
 void output(struct grid *g, int nout)
 {
 	char filename[BUF_LEN];
+	FILE *f;
+
+	if (nout == 0) {
+		sprintf(filename, "data/param.dat", nout);
+		if ((f = fopen(filename, "w")) == NULL) {
+			fprintf(stderr, "unable to open %s\n", filename);
+			exit(EXIT_FAILURE);
+		}
+
+		fprintf(f, "%d\n", g->nx - 4);
+		fprintf(f, "%d\n", g->ny - 4);
+		fprintf(f, "%g\n", g->dx);
+		fprintf(f, "%g\n", g->dy);
+
+		fclose(f);
+	}
 
 	sprintf(filename, "data/rho_%05d.dat", nout);
 	output_array(filename, g->prim[0], g->nx, g->ny);
@@ -39,12 +60,17 @@ int main()
 	double out_time;
 	struct grid *g;
 
+#ifdef CDEBUG
+	feenableexcept(FE_INVALID | FE_OVERFLOW | FE_DIVBYZERO);
+#endif /* CDEBUG */
+
 	g = alloc_grid(NX, NY, DX, DY);
 	init_grid(g);
 
 	nout = 0;
 	out_time = 0;
 	for (epoch = 0; epoch < MAX_EPOCH; epoch++) {
+		printf("t = %g | dt = %g\n", g->time, g->dt);
 		if (g->time >= out_time) {
 			output(g, nout);
 			out_time = g->time + OUT_DT;

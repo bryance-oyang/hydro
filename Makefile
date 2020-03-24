@@ -2,7 +2,7 @@ EXEC=z.out
 srcdir=
 
 SHELL=/bin/zsh
-CC=gcc -pipe -mtune=native -march=native
+CC=gcc-mp-9 -pipe -mtune=native -march=native
 OFLAGS=-O3 -flto
 CFLAGS+=-std=gnu90 -Wall -Wextra
 LDFLAGS=-lc -lm
@@ -38,20 +38,20 @@ endif
 all: $(DEPS) $(EXEC)
 	@echo done
 
-.PRECIOUS: data/infected_00000.dat
-data/infected_00000.dat: $(DEPS) $(EXEC)
+.PRECIOUS: data/rho_00000.dat
+data/rho_00000.dat: $(DEPS) $(EXEC)
 	-rm -rf data
 	mkdir data
 	-./z.out
 
-.PRECIOUS: img/00000.png
-img/00000.png: data/infected_00000.dat plot.py
+.PRECIOUS: img/img_00000.png
+img/img_00000.png: data/rho_00000.dat plot.py
 	-rm -rf img
 	mkdir img
 	-python3 plot.py
 
 .PHONY: plot
-plot: img/00000.png
+plot: img/img_00000.png
 	@echo done
 
 .PHONY: clean
