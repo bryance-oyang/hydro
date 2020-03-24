@@ -34,7 +34,11 @@ void reconstruct(struct grid *g, int dir)
 				q1 = CEL(g->prim[n],i,j);
 				q2 = CEL(g->prim[n],i+di,j+dj);
 
-				half_step = 0.5 * slope_lim((q1 - q0) / (q2 - q1)) * (q2 - q1);
+				if ((q2 - q1) == 0) {
+					half_step = 0;
+				} else {
+					half_step = 0.5 * slope_lim((q1 - q0) / (q2 - q1)) * (q2 - q1);
+				}
 
 				Lq = q1 + half_step;
 				Uq = q1 - half_step;
@@ -55,7 +59,11 @@ void reconstruct(struct grid *g, int dir)
 				q1 = CEL(g->s[m],i,j);
 				q2 = CEL(g->s[m],i+di,j+dj);
 
-				half_step = 0.5 * slope_lim((q1 - q0) / (q2 - q1)) * (q2 - q1);
+				if ((q2 - q1) == 0) {
+					half_step = 0;
+				} else {
+					half_step = 0.5 * slope_lim((q1 - q0) / (q2 - q1)) * (q2 - q1);
+				}
 
 				Lq = q1 + half_step;
 				Uq = q1 - half_step;
@@ -76,7 +84,8 @@ void reconstruct(struct grid *g, int dir)
 void wavespeed(struct grid *g, int step, int dir)
 {
 	int i, j, nx, ny;
-	int di, dj, du;
+	int di, dj; 
+	double du;
 
 	nx = g->nx;
 	ny = g->ny;

@@ -33,7 +33,7 @@ void output(struct grid *g, int nout)
 	FILE *f;
 
 	if (nout == 0) {
-		sprintf(filename, "data/param.dat", nout);
+		sprintf(filename, "data/param.dat");
 		if ((f = fopen(filename, "w")) == NULL) {
 			fprintf(stderr, "unable to open %s\n", filename);
 			exit(EXIT_FAILURE);
