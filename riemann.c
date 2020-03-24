@@ -51,17 +51,17 @@ void reconstruct(struct grid *g, int dir)
 				double q0, q1, q2;
 				double half_step, Lq, Uq;
 
-				q0 = CEL(g->s[n],i-di,j-dj);
-				q1 = CEL(g->s[n],i,j);
-				q2 = CEL(g->s[n],i+di,j+dj);
+				q0 = CEL(g->s[m],i-di,j-dj);
+				q1 = CEL(g->s[m],i,j);
+				q2 = CEL(g->s[m],i+di,j+dj);
 
 				half_step = 0.5 * slope_lim((q1 - q0) / (q2 - q1)) * (q2 - q1);
 
 				Lq = q1 + half_step;
 				Uq = q1 - half_step;
 
-				FEL(g->Us[n],i,j) = Uq;
-				FEL(g->Ls[n],i+di,j+dj) = Lq;
+				FEL(g->Us[m],i,j) = Uq;
+				FEL(g->Ls[m],i+di,j+dj) = Lq;
 			}
 		}
 	}

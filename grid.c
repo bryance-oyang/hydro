@@ -74,8 +74,8 @@ struct grid *alloc_grid(int nx, int ny, double dx, double dy)
 	for (m = 0; m < NSCALAR; m++) {
 		C_ALLOC(s[m]);
 		C_ALLOC(s_gen[m]);
-		C_ALLOC(Ls[m]);
-		C_ALLOC(Us[m]);
+		F_ALLOC(Ls[m]);
+		F_ALLOC(Us[m]);
 		F_ALLOC(s_Jx[m]);
 		F_ALLOC(s_Jy[m]);
 		C_ALLOC(s_src[m]);
@@ -123,4 +123,6 @@ void free_grid(struct grid *g)
 		FREE(s_src[m]);
 	}
 #undef FREE
+
+	free(g);
 }

@@ -3,8 +3,8 @@
 
 #define HLLC 0
 
-#define NX 100
-#define NY 100
+#define NX 10
+#define NY 10
 #define DX 1
 #define DY 1
 
@@ -12,9 +12,9 @@
 #define RHO_FLOOR 1e-6
 #define PRESS_FLOOR 1e-8
 
-#define MAX_OUT 100
+#define MAX_OUT 3
 #define OUT_DT 0.1
-#define MAX_EPOCH 1000000000
+#define MAX_EPOCH 3
 #define CFL_NUM 0.36
 
 #define BUF_LEN 1024
