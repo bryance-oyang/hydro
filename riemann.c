@@ -196,16 +196,12 @@ void hlle(struct grid *g, int dir)
 			for (j = 2; j < ny-1; j++) {
 				double Lw, Uw;
 				double Lv, Uv;
-				double Lpress, Upress;
 
 				Lw = FEL(g->Lw,i,j);
 				Uw = FEL(g->Uw,i,j);
 
 				Lv = FEL(g->Lprim[1+dir],i,j);
 				Uv = FEL(g->Uprim[1+dir],i,j);
-
-				Lpress = FEL(g->Lprim[3],i,j);
-				Upress = FEL(g->Uprim[3],i,j);
 
 				double Lq, Uq;
 				double LJ, UJ;
