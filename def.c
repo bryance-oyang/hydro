@@ -1,7 +1,5 @@
 #include "def.h"
 
-int NX;
-int NY;
 double XMIN;
 double XMAX;
 double YMIN;
@@ -16,8 +14,6 @@ double GRAV;
 
 void global_const()
 {
-	NX = 128;
-	NY = 128;
 	XMIN = -0.5;
 	XMAX = 0.5;
 	YMIN = -0.5;
@@ -27,8 +23,6 @@ void global_const()
 	GRAV = 0;
 
 #if KH_INSTAB == 1
-	NX = 128;
-	NY = 128;
 	XMIN = -0.5;
 	XMAX = 0.5;
 	YMIN = -0.5;
@@ -39,8 +33,6 @@ void global_const()
 #endif
 
 #if RT_INSTAB == 1
-	NX = 128;
-	NY = 128;
 	XMIN = -0.75;
 	XMAX = 0.75;
 	YMIN = -0.75;
@@ -51,8 +43,6 @@ void global_const()
 #endif
 
 #if SOD_SHOCK == 1
-	NX = 300;
-	NY = 600;
 	XMIN = -0.5;
 	XMAX = 0.5;
 	YMIN = -0.75;
@@ -63,8 +53,6 @@ void global_const()
 #endif
 
 #if BLAST == 1
-	NX = 512;
-	NY = 512;
 	XMIN = -0.5;
 	XMAX = 0.5;
 	YMIN = -0.5;
@@ -75,8 +63,6 @@ void global_const()
 #endif
 
 #if STATIC_GRAV_TEST == 1
-	NX = 512;
-	NY = 512;
 	XMIN = -0.5;
 	XMAX = 0.5;
 	YMIN = -0.5;
@@ -86,9 +72,18 @@ void global_const()
 	GRAV = 0.1;
 #endif
 
+#if SUPERSONIC == 1
+	XMIN = -0.5;
+	XMAX = 0.5;
+	YMIN = -0.5;
+	YMAX = 0.5;
+	OUT_TF = 2;
+	GAMMA = 1.4;
+	GRAV = 1;
+#endif
+
 	XRANGE = XMAX - XMIN;
 	YRANGE = YMAX - YMIN;
-
 	DX = XRANGE / (NX - 4);
 	DY = YRANGE / (NY - 4);
 }

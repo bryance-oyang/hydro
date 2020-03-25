@@ -18,19 +18,23 @@ rc("savefig", format="pdf", bbox="tight")
 import numpy as np
 import os
 
+param = np.loadtxt("data/param.dat")
+nx = param[0]
+ny = param[1]
+dx = param[2]
+dy = param[3]
+xmin = param[4]
+xmax = param[5]
+ymin = param[6]
+ymax = param[7]
+
 for fnum in range(200):
 	print("fnum = %d" % fnum)
 
-	if fnum == 0:
-		param = np.loadtxt("data/param.dat")
-		nx = param[0]
-		ny = param[1]
-		dx = param[2]
-		dy = param[3]
 	rho = np.transpose(np.loadtxt("data/rho_%05d.dat" % fnum))
 	press = np.transpose(np.loadtxt("data/press_%05d.dat" % fnum))
 
-	[x, y] = np.mgrid[0:(nx+1)*dx:(nx+1)*1j, 0:(ny+1)*dy:(ny+1)*1j]
+	[x, y] = np.mgrid[xmin:xmax:(nx+1)*1j, ymin:ymax:(ny+1)*1j]
 
 	def pl(ax, q, cmap="viridis", vbound=None):
 		if vbound is None:
@@ -53,7 +57,7 @@ for fnum in range(200):
 	pl(ax, rho, cmap="viridis", vbound=[0,2.5])
 
 	ax = fig.add_subplot(gs[0,1])
-	pl(ax, press, cmap="inferno", vbound=[0,3])
+	pl(ax, press / rho, cmap="inferno", vbound=[0,2])
 
 	gs.tight_layout(fig)
 	#plt.show()

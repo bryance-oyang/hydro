@@ -314,7 +314,7 @@ void hllc(struct grid *g, int dir)
 					}
 				}
 				for (m = 0; m < NSCALAR; m++) {
-					FEL(s_J[m],i,j) = Uv * FEL(g->Us[m],i,j);
+					FEL(s_J[m],i,j) = FEL(g->Us[m],i,j) * Uv;
 				}
 				continue;
 			}
@@ -329,7 +329,7 @@ void hllc(struct grid *g, int dir)
 					}
 				}
 				for (m = 0; m < NSCALAR; m++) {
-					FEL(s_J[m],i,j) = Lv * FEL(g->Ls[m],i,j);
+					FEL(s_J[m],i,j) = FEL(g->Ls[m],i,j) * Lv;
 				}
 				continue;
 			}
@@ -371,7 +371,7 @@ void hllc(struct grid *g, int dir)
 				FEL(J[3],i,j) = (e3 + Mpress) * Mw;
 
 				for (m = 0; m < NSCALAR; m++) {
-					FEL(s_J[m],i,j) = (Uv - Uw) / (Mw - Uw) * FEL(g->Us[m],i,j);
+					FEL(s_J[m],i,j) = (Uv - Uw) / (Mw - Uw) * FEL(g->Us[m],i,j) * Mw;
 				}
 			} else {
 				e2 = (Lv*(Le+Lpress) - Lw*Le - Mw*Mpress) / (Mw - Lw);
@@ -387,7 +387,7 @@ void hllc(struct grid *g, int dir)
 				FEL(J[3],i,j) = (e2 + Mpress) * Mw;
 
 				for (m = 0; m < NSCALAR; m++) {
-					FEL(s_J[m],i,j) = (Lv - Lw) / (Mw - Lw) * FEL(g->Ls[m],i,j);
+					FEL(s_J[m],i,j) = (Lv - Lw) / (Mw - Lw) * FEL(g->Ls[m],i,j) * Mw;
 				}
 			}
 		}

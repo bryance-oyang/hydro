@@ -97,10 +97,33 @@ void init_grid(struct grid *g)
 			if (STATIC_GRAV_TEST) {
 				double rho;
 				rho = 1;
-				CEL(g->prim[0],i,j) = rho;
-				CEL(g->prim[1],i,j) = 0;
-				CEL(g->prim[2],i,j) = 0;
-				CEL(g->prim[3],i,j) = 1 - GRAV * rho * y;
+				if (i == nx/2 && j == ny/2) {
+					CEL(g->prim[0],i,j) = 100;
+					CEL(g->prim[1],i,j) = 0;
+					CEL(g->prim[2],i,j) = 0;
+					CEL(g->prim[3],i,j) = 100;
+				} else {
+					CEL(g->prim[0],i,j) = rho;
+					CEL(g->prim[1],i,j) = 0;
+					CEL(g->prim[2],i,j) = 0;
+					CEL(g->prim[3],i,j) = 1 - GRAV * rho * y;
+				}
+			}
+
+			if (SUPERSONIC) {
+				double rho;
+				rho = 1;
+				if (fabs(x) < 0.1 && fabs(y) < 0.1) {
+					CEL(g->prim[0],i,j) = 2;
+					CEL(g->prim[1],i,j) = -5;
+					CEL(g->prim[2],i,j) = -3;
+					CEL(g->prim[3],i,j) = 2;
+				} else {
+					CEL(g->prim[0],i,j) = rho;
+					CEL(g->prim[1],i,j) = 0;
+					CEL(g->prim[2],i,j) = 0;
+					CEL(g->prim[3],i,j) = 1 - GRAV * rho * y;
+				}
 			}
 		}
 	}
@@ -138,11 +161,12 @@ struct grid *alloc_grid(int nx, int ny, double dx, double dy)
 
 		C_ALLOC(src[n]);
 
-		C_ALLOC(x_cc);
-		C_ALLOC(y_cc);
-		F_ALLOC(x_fc);
-		F_ALLOC(y_fc);
 	}
+	C_ALLOC(x_cc);
+	C_ALLOC(y_cc);
+	F_ALLOC(x_fc);
+	F_ALLOC(y_fc);
+
 	C_ALLOC(cs);
 	F_ALLOC(Lw);
 	F_ALLOC(Uw);
@@ -182,12 +206,12 @@ void free_grid(struct grid *g)
 		FREE(Jy[n]);
 
 		FREE(src[n]);
-
-		FREE(x_cc);
-		FREE(y_cc);
-		FREE(x_fc);
-		FREE(y_fc);
 	}
+	FREE(x_cc);
+	FREE(y_cc);
+	FREE(x_fc);
+	FREE(y_fc);
+
 	FREE(cs);
 	FREE(Lw);
 	FREE(Uw);

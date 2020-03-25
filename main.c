@@ -7,8 +7,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern int NX;
-extern int NY;
+extern double XMIN;
+extern double XMAX;
+extern double YMIN;
+extern double YMAX;
 extern double DX;
 extern double DY;
 extern double OUT_TF;
@@ -49,6 +51,10 @@ void output(struct grid *g, int nout)
 		fprintf(f, "%d\n", g->ny-4);
 		fprintf(f, "%g\n", g->dx);
 		fprintf(f, "%g\n", g->dy);
+		fprintf(f, "%g\n", XMIN);
+		fprintf(f, "%g\n", XMAX);
+		fprintf(f, "%g\n", YMIN);
+		fprintf(f, "%g\n", YMAX);
 
 		fclose(f);
 	}
