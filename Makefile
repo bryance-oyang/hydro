@@ -1,5 +1,5 @@
 EXEC=z.out
-srcdir=
+srcdir=src
 
 SHELL=/bin/sh
 CC=gcc -pipe -mtune=native -march=native
