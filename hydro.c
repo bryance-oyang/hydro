@@ -196,8 +196,8 @@ static void add_flux_div_src(struct grid *g, int step)
 		for (i = 2; i < nx-2; i++) {
 			for (j = 2; j < ny-2; j++) {
 				CEL(g->cons[n],i,j) = CEL(g->cons_gen[n],i,j)
-					+ xfac * (CEL(g->Jx[n],i,j) - CEL(g->Jx[n],i+1,j))
-					+ yfac * (CEL(g->Jy[n],i,j) - CEL(g->Jy[n],i,j+1))
+					+ xfac * (FEL(g->Jx[n],i,j) - FEL(g->Jx[n],i+1,j))
+					+ yfac * (FEL(g->Jy[n],i,j) - FEL(g->Jy[n],i,j+1))
 					+ dt * CEL(g->src[n],i,j);
 			}
 		}
@@ -210,8 +210,8 @@ static void add_flux_div_src(struct grid *g, int step)
 		for (i = 2; i < nx-2; i++) {
 			for (j = 2; j < ny-2; j++) {
 				CEL(g->s[m],i,j) = CEL(g->s_gen[m],i,j)
-					+ xfac * (CEL(g->s_Jx[m],i,j) - CEL(g->s_Jx[m],i+1,j))
-					+ yfac * (CEL(g->s_Jy[m],i,j) - CEL(g->s_Jy[m],i,j+1))
+					+ xfac * (FEL(g->s_Jx[m],i,j) - FEL(g->s_Jx[m],i+1,j))
+					+ yfac * (FEL(g->s_Jy[m],i,j) - FEL(g->s_Jy[m],i,j+1))
 					+ dt * CEL(g->s_src[m],i,j);
 			}
 		}
