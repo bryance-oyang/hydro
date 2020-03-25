@@ -30,7 +30,7 @@ for fnum in range(200):
 	rho = np.transpose(np.loadtxt("data/rho_%05d.dat" % fnum))
 	press = np.transpose(np.loadtxt("data/press_%05d.dat" % fnum))
 
-	[x, y] = np.mgrid[0:nx*dx:nx*1j, 0:ny*dy:ny*1j]
+	[x, y] = np.mgrid[0:(nx+1)*dx:(nx+1)*1j, 0:(ny+1)*dy:(ny+1)*1j]
 
 	def pl(ax, q, cmap="viridis", vbound=None):
 		if vbound is None:
@@ -39,7 +39,7 @@ for fnum in range(200):
 		else:
 			[vmin, vmax] = vbound
 
-		im = ax.pcolormesh(x, y, rho, cmap=cmap, norm=colors.Normalize(vmin=vmin, vmax=vmax))
+		im = ax.pcolormesh(x.T, y.T, q, cmap=cmap, norm=colors.Normalize(vmin=vmin, vmax=vmax))
 		ax.set_aspect(1)
 		divider = make_axes_locatable(ax)
 		cax = divider.append_axes("right", size="5%", pad=0.05)

@@ -39,8 +39,8 @@ void output(struct grid *g, int nout)
 			exit(EXIT_FAILURE);
 		}
 
-		fprintf(f, "%d\n", g->nx - 4);
-		fprintf(f, "%d\n", g->ny - 4);
+		fprintf(f, "%d\n", g->nx-4);
+		fprintf(f, "%d\n", g->ny-4);
 		fprintf(f, "%g\n", g->dx);
 		fprintf(f, "%g\n", g->dy);
 

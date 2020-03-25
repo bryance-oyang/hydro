@@ -2,8 +2,8 @@ EXEC=z.out
 srcdir=
 
 SHELL=/bin/zsh
-CC=gcc -pipe -mtune=native -march=native
-OFLAGS=-O3 -flto
+CC=gcc-mp-9 -pipe -mtune=native -march=native
+OFLAGS=-O3 -flto -fopenmp
 CFLAGS+=-std=gnu90 -Wall -Wextra
 LDFLAGS=-lc -lm
 CDEBUG=-g -p -DCDEBUG

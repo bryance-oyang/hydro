@@ -18,7 +18,7 @@ void init_grid(struct grid *g)
 			x = i*dx;
 			y = j*dy;
 
-			if (j < ny/2) {
+			if (i < nx/2) {
 				CEL(g->prim[0],i,j) = 1;
 				CEL(g->prim[1],i,j) = 0;
 				CEL(g->prim[2],i,j) = 0;

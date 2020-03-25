@@ -1,10 +1,13 @@
 #ifndef DEF_H
 #define DEF_H
 
+#define NTHREAD 4
+#define THREAD_SCHEDULE static
+
 #define HLLC 0
 
-#define NX 100
-#define NY 100
+#define NX 200
+#define NY 200
 #define DX 0.1
 #define DY 0.1
 

@@ -25,8 +25,11 @@ void reconstruct(struct grid *g, int dir)
 	}
 
 	for (n = 0; n < 4; n++) {
-		for (i = 2; i < nx-1; i++) {
-			for (j = 2; j < ny-1; j++) {
+#if _OPENMP
+#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#endif /* _OPENMP */
+		for (i = 1; i < nx-1; i++) {
+			for (j = 1; j < ny-1; j++) {
 				double q0, q1, q2;
 				double half_step, Lq, Uq;
 
@@ -50,8 +53,11 @@ void reconstruct(struct grid *g, int dir)
 	}
 
 	for (m = 0; m < NSCALAR; m++) {
-		for (i = 2; i < nx-1; i++) {
-			for (j = 2; j < ny-1; j++) {
+#if _OPENMP
+#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#endif /* _OPENMP */
+		for (i = 1; i < nx-1; i++) {
+			for (j = 1; j < ny-1; j++) {
 				double q0, q1, q2;
 				double half_step, Lq, Uq;
 
@@ -155,6 +161,9 @@ void hlle(struct grid *g, int dir)
 	}
 
 	for (n = 0; n < 4; n++) {
+#if _OPENMP
+#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#endif /* _OPENMP */
 		for (i = 2; i < nx-1; i++) {
 			for (j = 2; j < ny-1; j++) {
 				double Lw, Uw;
@@ -201,6 +210,9 @@ void hlle(struct grid *g, int dir)
 	}
 
 	for (m = 0; m < NSCALAR; m++) {
+#if _OPENMP
+#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#endif /* _OPENMP */
 		for (i = 2; i < nx-1; i++) {
 			for (j = 2; j < ny-1; j++) {
 				double Lw, Uw;

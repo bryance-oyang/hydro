@@ -66,14 +66,21 @@ static void compute_src(struct grid *g)
 	nx = g->nx;
 	ny = g->ny;
 
-	for (n = 0; n < 4; n++) {
-		for (i = 2; i < nx-2; i++) {
-			for (j = 2; j < ny-2; j++) {
-				CEL(g->src[n],i,j) = 0;
-			}
+#if _OPENMP
+#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#endif /* _OPENMP */
+	for (i = 2; i < nx-2; i++) {
+		for (j = 2; j < ny-2; j++) {
+			CEL(g->src[0],i,j) = 0;
+			CEL(g->src[1],i,j) = 0;
+			CEL(g->src[2],i,j) = 0;
+			CEL(g->src[3],i,j) = 0;
 		}
 	}
 
+#if _OPENMP
+#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#endif /* _OPENMP */
 	for (m = 0; m < NSCALAR; m++) {
 		for (i = 2; i < nx-2; i++) {
 			for (j = 2; j < ny-2; j++) {
@@ -92,6 +99,9 @@ static void copy_gen(struct grid *g)
 	ny = g->ny;
 
 	for (n = 0; n < 4; n++) {
+#if _OPENMP
+#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#endif /* _OPENMP */
 		for (i = 2; i < nx-2; i++) {
 			for (j = 2; j < ny-2; j++) {
 				CEL(g->prim_gen[n],i,j) = CEL(g->prim[n],i,j);
@@ -101,6 +111,9 @@ static void copy_gen(struct grid *g)
 	}
 
 	for (m = 0; m < NSCALAR; m++) {
+#if _OPENMP
+#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#endif /* _OPENMP */
 		for (i = 2; i < nx-2; i++) {
 			for (j = 2; j < ny-2; j++) {
 				CEL(g->s_gen[m],i,j) = CEL(g->s[m],i,j);
@@ -129,6 +142,9 @@ static void add_flux_div_src(struct grid *g, int step)
 	yfac = dt / g->dy;
 
 	for (n = 0; n < 4; n++) {
+#if _OPENMP
+#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#endif /* _OPENMP */
 		for (i = 2; i < nx-2; i++) {
 			for (j = 2; j < ny-2; j++) {
 				CEL(g->cons[n],i,j) = CEL(g->cons_gen[n],i,j)
@@ -140,6 +156,9 @@ static void add_flux_div_src(struct grid *g, int step)
 	}
 
 	for (m = 0; m < NSCALAR; m++) {
+#if _OPENMP
+#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#endif /* _OPENMP */
 		for (i = 2; i < nx-2; i++) {
 			for (j = 2; j < ny-2; j++) {
 				CEL(g->s[m],i,j) = CEL(g->s_gen[m],i,j)
