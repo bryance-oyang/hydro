@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+extern double XMIN;
+extern double YMIN;
 extern double GRAV;
 
 void init_grid(struct grid *g)
@@ -90,6 +92,15 @@ void init_grid(struct grid *g)
 					CEL(g->prim[2],i,j) = 0;
 					CEL(g->prim[3],i,j) = 1;
 				}
+			}
+
+			if (STATIC_GRAV_TEST) {
+				double rho;
+				rho = 1;
+				CEL(g->prim[0],i,j) = rho;
+				CEL(g->prim[1],i,j) = 0;
+				CEL(g->prim[2],i,j) = 0;
+				CEL(g->prim[3],i,j) = 1 - GRAV * rho * y;
 			}
 		}
 	}

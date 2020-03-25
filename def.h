@@ -8,7 +8,8 @@
 #define KH_INSTAB 0
 #define RT_INSTAB 0
 #define SOD_SHOCK 0
-#define BLAST 1
+#define BLAST 0
+#define STATIC_GRAV_TEST 1
 
 #define NSCALAR 1
 #define RHO_FLOOR 1e-6

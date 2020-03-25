@@ -21,7 +21,7 @@ void boundary(struct grid *g)
 	}
 }
 
-static void potential(double x, double y)
+static double potential(double x, double y)
 {
 	return -GRAV * y;
 }
