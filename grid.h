@@ -16,15 +16,12 @@ struct grid {
 	double *Ucons[4];
 
 	double *Lw;
-	double *Mw;
 	double *Uw;
-	double *Mpress;
 
 	double *Jx[4];
 	double *Jy[4];
 	double *src[4];
 
-	/* scalars */
 	double *s[NSCALAR];
 	double *s_gen[NSCALAR];
 	double *Ls[NSCALAR];
@@ -32,6 +29,11 @@ struct grid {
 	double *s_Jx[NSCALAR];
 	double *s_Jy[NSCALAR];
 	double *s_src[NSCALAR];
+
+	double *x_cc;
+	double *y_cc;
+	double *x_fc;
+	double *y_fc;
 
 	double time;
 	double dt;

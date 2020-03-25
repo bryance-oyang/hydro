@@ -16,14 +16,21 @@ void init_grid(struct grid *g)
 	dx = g->dx;
 	dy = g->dy;
 
+	for (i = 2; i < nx-1; i++) {
+		for (j = 2; j < ny-1; j++) {
+			CEL(g->x_cc,i,j) = XMIN + (i+0.5)*dx;
+			CEL(g->y_cc,i,j) = YMIN + (j+0.5)*dy;
+			FEL(g->x_fc,i,j) = XMIN + i*dx;
+			FEL(g->y_fc,i,j) = YMIN + j*dy;
+		}
+	}
+
 	for (i = 0; i < nx; i++) {
 		for (j = 0; j < ny; j++) {
-			x = i*dx;
-			y = j*dy;
+			x = CEL(g->x_cc,i,j);
+			y = CEL(g->y_cc,i,j);
 
 			if (KH_INSTAB) {
-				x -= 0.5;
-				y -= 0.5;
 				if (fabs(y) > 0.25) {
 					CEL(g->prim[0],i,j) = 1;
 					CEL(g->prim[1],i,j) = 0.5;
@@ -41,8 +48,6 @@ void init_grid(struct grid *g)
 			}
 
 			if (RT_INSTAB) {
-				x -= 0.75;
-				y -= 0.75;
 				double rho;
 				if (y > 0) {
 					rho = 2;
@@ -121,12 +126,15 @@ struct grid *alloc_grid(int nx, int ny, double dx, double dy)
 		F_ALLOC(Jy[n]);
 
 		C_ALLOC(src[n]);
+
+		C_ALLOC(x_cc);
+		C_ALLOC(y_cc);
+		F_ALLOC(x_fc);
+		F_ALLOC(y_fc);
 	}
 	C_ALLOC(cs);
 	F_ALLOC(Lw);
-	F_ALLOC(Mw);
 	F_ALLOC(Uw);
-	F_ALLOC(Mpress);
 
 	for (m = 0; m < NSCALAR; m++) {
 		C_ALLOC(s[m]);
@@ -163,12 +171,15 @@ void free_grid(struct grid *g)
 		FREE(Jy[n]);
 
 		FREE(src[n]);
+
+		FREE(x_cc);
+		FREE(y_cc);
+		FREE(x_fc);
+		FREE(y_fc);
 	}
 	FREE(cs);
 	FREE(Lw);
-	FREE(Mw);
 	FREE(Uw);
-	FREE(Mpress);
 
 	for (m = 0; m < NSCALAR; m++) {
 		FREE(s[m]);

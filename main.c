@@ -74,6 +74,7 @@ int main()
 
 	g = alloc_grid(NX, NY, DX, DY);
 	init_grid(g);
+	boundary(g);
 
 	nout = 0;
 	out_time = 0;

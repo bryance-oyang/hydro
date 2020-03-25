@@ -2,6 +2,10 @@
 
 int NX;
 int NY;
+double XMIN;
+double XMAX;
+double YMIN;
+double YMAX;
 double XRANGE;
 double YRANGE;
 double DX;
@@ -12,13 +16,23 @@ double GRAV;
 
 void global_const()
 {
+	NX = 128;
+	NY = 128;
+	XMIN = -0.5;
+	XMAX = 0.5;
+	YMIN = -0.5;
+	YMAX = 0.5;
+	OUT_TF = 12;
+	GAMMA = 1.4;
+	GRAV = 0;
+
 #if KH_INSTAB == 1
 	NX = 128;
 	NY = 128;
-	XRANGE = 1;
-	YRANGE = 1;
-	DX = XRANGE / NX;
-	DY = YRANGE / NY;
+	XMIN = -0.5;
+	XMAX = 0.5;
+	YMIN = -0.5;
+	YMAX = 0.5;
 	OUT_TF = 12;
 	GAMMA = 1.4;
 	GRAV = 0;
@@ -27,10 +41,10 @@ void global_const()
 #if RT_INSTAB == 1
 	NX = 512;
 	NY = 512;
-	XRANGE = 1.5;
-	YRANGE = 1.5;
-	DX = XRANGE / NX;
-	DY = YRANGE / NY;
+	XMIN = -0.75;
+	XMAX = 0.75;
+	YMIN = -0.75;
+	YMAX = 0.75;
 	OUT_TF = 12.75;
 	GAMMA = 1.4;
 	GRAV = 0.1;
@@ -39,10 +53,10 @@ void global_const()
 #if SOD_SHOCK == 1
 	NX = 300;
 	NY = 600;
-	XRANGE = 1;
-	YRANGE = 1.5;
-	DX = XRANGE / NX;
-	DY = YRANGE / NY;
+	XMIN = -0.5;
+	XMAX = 0.5;
+	YMIN = -0.75;
+	YMAX = 0.75;
 	OUT_TF = 1;
 	GAMMA = 5.0/3.0;
 	GRAV = 0.1;
@@ -51,12 +65,18 @@ void global_const()
 #if BLAST == 1
 	NX = 512;
 	NY = 512;
-	XRANGE = 1;
-	YRANGE = 1;
-	DX = XRANGE / NX;
-	DY = YRANGE / NY;
+	XMIN = -0.5;
+	XMAX = 0.5;
+	YMIN = -0.5;
+	YMAX = 0.5;
 	OUT_TF = 2;
 	GAMMA = 1.4;
 	GRAV = 0;
 #endif
+
+	XRANGE = XMAX - XMIN;
+	YRANGE = YMAX - YMIN;
+
+	DX = XRANGE / (NX - 4);
+	DY = YRANGE / (NY - 4);
 }

@@ -6,7 +6,7 @@
 
 extern double GRAV;
 
-static void boundary(struct grid *g)
+void boundary(struct grid *g)
 {
 	if (KH_INSTAB) {
 		smooth_boundary_left(g);
@@ -21,24 +21,49 @@ static void boundary(struct grid *g)
 	}
 }
 
+static void potential(double x, double y)
+{
+	return -GRAV * y;
+}
 
 static void compute_src(struct grid *g)
 {
 	int i, j, nx, ny;
 	int m;
+	double dx, dy;
 
 	nx = g->nx;
 	ny = g->ny;
+	dx = g->dx;
+	dy = g->dy;
 
 #if _OPENMP
 #pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
 	for (i = 2; i < nx-2; i++) {
 		for (j = 2; j < ny-2; j++) {
+			double Lx, Ux, Ly, Uy, x, y;
+			double div_rhov, div_rhovpot, pot_cc;
+
+			Lx = FEL(g->x_fc,i,j);
+			Ly = FEL(g->y_fc,i,j);
+			Ux = FEL(g->x_fc,i+1,j);
+			Uy = FEL(g->y_fc,i,j+1);
+			x = CEL(g->x_cc,i,j);
+			y = CEL(g->y_cc,i,j);
+
+			div_rhov = (FEL(g->Jx[0],i+1,j) - FEL(g->Jx[0],i,j)) / dx
+				+ (FEL(g->Jy[0],i,j+1) - FEL(g->Jy[0],i,j)) / dy;
+
+			div_rhovpot = (potential(Ux, y) * FEL(g->Jx[0],i+1,j) - potential(Lx, y) * FEL(g->Jx[0],i,j)) / dx
+				+ (potential(x, Uy) * FEL(g->Jy[0],i,j+1) - potential(x, Ly) * FEL(g->Jy[0],i,j)) / dy;
+
+			pot_cc = potential(x, y);
+
 			CEL(g->src[0],i,j) = 0;
 			CEL(g->src[1],i,j) = 0;
 			CEL(g->src[2],i,j) = -GRAV * CEL(g->prim[0],i,j);
-			CEL(g->src[3],i,j) = -GRAV * CEL(g->prim[0],i,j) * CEL(g->prim[2],i,j);
+			CEL(g->src[3],i,j) = pot_cc * div_rhov - div_rhovpot;
 		}
 	}
 
