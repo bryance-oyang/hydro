@@ -15,7 +15,7 @@
 
 #define MAX_OUT 100
 #define MAX_EPOCH 1000000000
-#define CFL_NUM 0.36
+#define CFL_NUM 0.16
 #define OUT_DT ((double)(OUT_TF) / (MAX_OUT - 1))
 
 #define BUF_LEN 1024

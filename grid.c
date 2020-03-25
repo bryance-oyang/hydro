@@ -41,7 +41,7 @@ void init_grid(struct grid *g)
 			}
 
 			if (RT_INSTAB) {
-				x -= 0.5;
+				x -= 0.75;
 				y -= 0.75;
 				double rho;
 				if (y > 0) {

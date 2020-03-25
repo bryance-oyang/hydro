@@ -25,9 +25,9 @@ void global_const()
 #endif
 
 #if RT_INSTAB == 1
-	NX = 300;
-	NY = 600;
-	XRANGE = 1;
+	NX = 512;
+	NY = 512;
+	XRANGE = 1.5;
 	YRANGE = 1.5;
 	DX = XRANGE / NX;
 	DY = YRANGE / NY;
