@@ -4,7 +4,10 @@
 
 static inline double slope_lim(double r)
 {
-	return fmax(0, fmin(r, 1));
+	double fabsr;
+
+	fabsr = fabs(r);
+	return (r + fabsr) / (1 + fabsr);
 }
 
 void reconstruct(struct grid *g, int dir)

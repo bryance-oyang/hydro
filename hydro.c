@@ -3,12 +3,30 @@
 #include "riemann.h"
 #include <float.h>
 
-static void reflecting_boundary(struct grid *g)
+static void smooth_boundary_top(struct grid *g)
 {
 	int i, j, k;
 	int nx, ny;
 
 	nx = g->nx;
+	ny = g->ny;
+
+	j = ny-1;
+	for (i = 2; i < nx-2; i++) {
+		for (k = 0; k < 2; k++) {
+			CEL(g->prim[0],i,j-k) = CEL(g->prim[0],i,j-3+k);
+			CEL(g->prim[1],i,j-k) = CEL(g->prim[1],i,j-3+k);
+			CEL(g->prim[2],i,j-k) = CEL(g->prim[2],i,j-3+k);
+			CEL(g->prim[3],i,j-k) = CEL(g->prim[3],i,j-3+k);
+		}
+	}
+}
+
+static void reflecting_boundary_left(struct grid *g)
+{
+	int i, j, k;
+	int ny;
+
 	ny = g->ny;
 
 	i = 0;
@@ -20,6 +38,15 @@ static void reflecting_boundary(struct grid *g)
 			CEL(g->prim[3],i+k,j) = CEL(g->prim[3],i+3-k,j);
 		}
 	}
+}
+
+static void reflecting_boundary_right(struct grid *g)
+{
+	int i, j, k;
+	int nx, ny;
+
+	nx = g->nx;
+	ny = g->ny;
 
 	i = nx-1;
 	for (k = 0; k < 2; k++) {
@@ -30,6 +57,15 @@ static void reflecting_boundary(struct grid *g)
 			CEL(g->prim[3],i-k,j) = CEL(g->prim[3],i-3+k,j);
 		}
 	}
+}
+
+static void reflecting_boundary_bot(struct grid *g)
+{
+	int i, j, k;
+	int nx, ny;
+
+	nx = g->nx;
+	ny = g->ny;
 
 	j = 0;
 	for (i = 2; i < nx-2; i++) {
@@ -40,6 +76,15 @@ static void reflecting_boundary(struct grid *g)
 			CEL(g->prim[3],i,j+k) = CEL(g->prim[3],i,j+3-k);
 		}
 	}
+}
+
+static void reflecting_boundary_top(struct grid *g)
+{
+	int i, j, k;
+	int nx, ny;
+
+	nx = g->nx;
+	ny = g->ny;
 
 	j = ny-1;
 	for (i = 2; i < nx-2; i++) {
@@ -54,14 +99,17 @@ static void reflecting_boundary(struct grid *g)
 
 static void boundary(struct grid *g)
 {
-	reflecting_boundary(g);
+	reflecting_boundary_top(g);
+	reflecting_boundary_bot(g);
+	reflecting_boundary_left(g);
+	reflecting_boundary_right(g);
 }
 
 
 static void compute_src(struct grid *g)
 {
 	int i, j, nx, ny;
-	int m, n;
+	int m;
 
 	nx = g->nx;
 	ny = g->ny;
@@ -73,8 +121,8 @@ static void compute_src(struct grid *g)
 		for (j = 2; j < ny-2; j++) {
 			CEL(g->src[0],i,j) = 0;
 			CEL(g->src[1],i,j) = 0;
-			CEL(g->src[2],i,j) = 0;
-			CEL(g->src[3],i,j) = 0;
+			CEL(g->src[2],i,j) = -GRAV * CEL(g->prim[0],i,j);
+			CEL(g->src[3],i,j) = -GRAV * CEL(g->prim[0],i,j) * CEL(g->prim[2],i,j);
 		}
 	}
 

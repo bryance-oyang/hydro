@@ -34,7 +34,7 @@ for fnum in range(200):
 
 	def pl(ax, q, cmap="viridis", vbound=None):
 		if vbound is None:
-			vmin = np.amin(q)
+			vmin = 0
 			vmax = np.amax(q)
 		else:
 			[vmin, vmax] = vbound
@@ -50,10 +50,10 @@ for fnum in range(200):
 	gs = gridspec.GridSpec(1, 2)
 
 	ax = fig.add_subplot(gs[0,0])
-	pl(ax, rho, cmap="viridis", vbound=None)
+	pl(ax, rho, cmap="gray", vbound=[0,2])
 
 	ax = fig.add_subplot(gs[0,1])
-	pl(ax, press, cmap="viridis", vbound=None)
+	pl(ax, press, cmap="gray", vbound=[0,3000])
 
 	gs.tight_layout(fig)
 	#plt.show()

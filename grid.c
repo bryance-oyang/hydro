@@ -2,6 +2,7 @@
 #include "emalloc.h"
 #include "eos.h"
 #include <stdlib.h>
+#include <math.h>
 
 void init_grid(struct grid *g)
 {
@@ -15,19 +16,22 @@ void init_grid(struct grid *g)
 
 	for (i = 0; i < nx; i++) {
 		for (j = 0; j < ny; j++) {
-			x = i*dx;
-			y = j*dy;
+			x = i*dx - 0.25;
+			y = j*dy - 0.75;
 
-			if (i < nx/2) {
-				CEL(g->prim[0],i,j) = 1;
+			double rho;
+			if (y > 0) {
+				rho = 2;
+				CEL(g->prim[0],i,j) = rho;
 				CEL(g->prim[1],i,j) = 0;
-				CEL(g->prim[2],i,j) = 0;
-				CEL(g->prim[3],i,j) = 1;
+				CEL(g->prim[2],i,j) = 0.01*(1 + cos(4*PI*x))*(1 + cos(3*PI*y))/4;
+				CEL(g->prim[3],i,j) = 2.5 - GRAV*rho*y;
 			} else {
-				CEL(g->prim[0],i,j) = 0.125;
+				rho = 1;
+				CEL(g->prim[0],i,j) = rho;
 				CEL(g->prim[1],i,j) = 0;
-				CEL(g->prim[2],i,j) = 0;
-				CEL(g->prim[3],i,j) = 0.1;
+				CEL(g->prim[2],i,j) = 0.01*(1 + cos(4*PI*x))*(1 + cos(3*PI*y))/4;
+				CEL(g->prim[3],i,j) = 2.5 - GRAV*rho*y;
 			}
 		}
 	}
