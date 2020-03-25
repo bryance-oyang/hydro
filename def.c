@@ -13,13 +13,13 @@ double GRAV;
 void global_const()
 {
 #if KH_INSTAB == 1
-	NX = 512;
-	NY = 512;
+	NX = 128;
+	NY = 128;
 	XRANGE = 1;
 	YRANGE = 1;
 	DX = XRANGE / NX;
 	DY = YRANGE / NY;
-	OUT_TF = 1;
+	OUT_TF = 12;
 	GAMMA = 1.4;
 	GRAV = 0;
 #endif
@@ -46,5 +46,17 @@ void global_const()
 	OUT_TF = 1;
 	GAMMA = 5.0/3.0;
 	GRAV = 0.1;
+#endif
+
+#if BLAST == 1
+	NX = 512;
+	NY = 512;
+	XRANGE = 1;
+	YRANGE = 1;
+	DX = XRANGE / NX;
+	DY = YRANGE / NY;
+	OUT_TF = 2;
+	GAMMA = 1.4;
+	GRAV = 0;
 #endif
 }
