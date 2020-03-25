@@ -200,13 +200,13 @@ void hlle(struct grid *g, int dir)
 				}
 
 				if (Lw == 0 && Uw == 0) {
-					CEL(J[n],i,j) = 0;
+					FEL(J[n],i,j) = 0;
 				} else if (Uw <= 0) {
-					CEL(J[n],i,j) = UJ;
+					FEL(J[n],i,j) = UJ;
 				} else if (Lw >= 0) {
-					CEL(J[n],i,j) = LJ;
+					FEL(J[n],i,j) = LJ;
 				} else {
-					CEL(J[n],i,j) = (LJ*Uw - UJ*Lw + Uw*Lw*(Uq - Lq)) / (Uw - Lw);
+					FEL(J[n],i,j) = (LJ*Uw - UJ*Lw + Uw*Lw*(Uq - Lq)) / (Uw - Lw);
 				}
 			}
 		}
@@ -236,13 +236,13 @@ void hlle(struct grid *g, int dir)
 				UJ = Uq * Uv;
 
 				if (Lw == 0 && Uw == 0) {
-					CEL(s_J[m],i,j) = 0;
+					FEL(s_J[m],i,j) = 0;
 				} else if (Uw <= 0) {
-					CEL(s_J[m],i,j) = UJ;
+					FEL(s_J[m],i,j) = UJ;
 				} else if (Lw >= 0) {
-					CEL(s_J[m],i,j) = LJ;
+					FEL(s_J[m],i,j) = LJ;
 				} else {
-					CEL(s_J[m],i,j) = (LJ*Uw - UJ*Lw + Uw*Lw*(Uq - Lq)) / (Uw - Lw);
+					FEL(s_J[m],i,j) = (LJ*Uw - UJ*Lw + Uw*Lw*(Uq - Lq)) / (Uw - Lw);
 				}
 			}
 		}
@@ -252,7 +252,7 @@ void hlle(struct grid *g, int dir)
 void hllc(struct grid *g, int dir)
 {
 	int i, j, nx, ny;
-	int m;
+	int m, n;
 	double **J, **s_J;
 
 	nx = g->nx;
@@ -268,6 +268,101 @@ void hllc(struct grid *g, int dir)
 
 	for (i = 2; i < nx-1; i++) {
 		for (j = 2; j < ny-1; j++) {
+			double Lw, Uw, Mw;
+			double Lv, Uv;
+			double Lpress, Upress, Mpress;
+			double Lrho, Urho, rho2, rho3;
+			double Le, Ue, e2, e3;
+
+			Lw = FEL(g->Lw,i,j);
+			Uw = FEL(g->Uw,i,j);
+
+			if (Lw == 0 && Uw == 0) {
+				for (n = 0; n < 4; n++) {
+					FEL(J[n],i,j) = 0;
+				}
+				continue;
+			}
+
+			Lrho = FEL(g->Lprim[0],i,j);
+			Urho = FEL(g->Uprim[0],i,j);
+			Lv = FEL(g->Lprim[1+dir],i,j);
+			Uv = FEL(g->Uprim[1+dir],i,j);
+			Lpress = FEL(g->Lprim[3],i,j);
+			Upress = FEL(g->Uprim[3],i,j);
+			Le = FEL(g->Lcons[3],i,j);
+			Ue = FEL(g->Ucons[3],i,j);
+
+			if (Uw <= 0) {
+				for (n = 0; n < 4; n++) {
+					FEL(J[n],i,j) = FEL(g->Ucons[n],i,j) * Uv;
+					if (n == 1+dir) {
+						FEL(J[n],i,j) += Upress;
+					}
+					if (n == 3) {
+						FEL(J[n],i,j) += Upress * Uv;
+					}
+				}
+				continue;
+			}
+			if (Lw >= 0) {
+				for (n = 0; n < 4; n++) {
+					FEL(J[n],i,j) = FEL(g->Lcons[n],i,j) * Lv;
+					if (n == 1+dir) {
+						FEL(J[n],i,j) += Lpress;
+					}
+					if (n == 3) {
+						FEL(J[n],i,j) += Lpress * Lv;
+					}
+				}
+				continue;
+			}
+
+			Mw = (Urho*Uv*(Uv-Uw) + Upress - Lrho*Lv*(Lv-Lw) - Lpress) / (Urho*(Uv-Uw) - Lrho*(Lv-Lw));
+			rho2 = Lrho * (Lv - Lw) / (Mw - Lw);
+			rho3 = Urho * (Uv - Uw) / (Mw - Uw);
+
+			if (Mw > 0) {
+				Mpress = Lrho*SQR(Lv) + Lpress - Lw*Lrho*Lv - rho2*SQR(Mw) + Lw*rho2*Mw;
+			} else {
+				Mpress = Urho*SQR(Uv) + Upress - Uw*Urho*Uv - rho3*SQR(Mw) + Uw*rho3*Mw;
+			}
+
+			if (Mw == 0) {
+				for (n = 0; n < 4; n++) {
+					FEL(J[n],i,j) = 0;
+					if (n == 1+dir) {
+						FEL(J[n],i,j) += Mpress;
+					}
+				}
+				continue;
+			}
+
+			if (Mw < 0) {
+				e3 = (Uv*(Ue+Upress) - Uw*Ue - Mw*Mpress) / (Mw - Uw);
+
+				FEL(J[0],i,j) = rho3 * Mw;
+				if (dir == 0) {
+					FEL(J[1],i,j) = rho3 * SQR(Mw) + Mpress;
+					FEL(J[2],i,j) = rho3 * FEL(g->Uprim[2],i,j) * Mw;
+				} else {
+					FEL(J[1],i,j) = rho3 * FEL(g->Uprim[1],i,j) * Mw;
+					FEL(J[2],i,j) = rho3 * SQR(Mw) + Mpress;
+				}
+				FEL(J[3],i,j) = (e3 + Mpress) * Mw;
+			} else {
+				e2 = (Lv*(Le+Lpress) - Lw*Le - Mw*Mpress) / (Mw - Lw);
+
+				FEL(J[0],i,j) = rho2 * Mw;
+				if (dir == 0) {
+					FEL(J[1],i,j) = rho2 * SQR(Mw) + Mpress;
+					FEL(J[2],i,j) = rho2 * FEL(g->Lprim[2],i,j) * Mw;
+				} else {
+					FEL(J[1],i,j) = rho2 * FEL(g->Lprim[1],i,j) * Mw;
+					FEL(J[2],i,j) = rho2 * SQR(Mw) + Mpress;
+				}
+				FEL(J[3],i,j) = (e2 + Mpress) * Mw;
+			}
 		}
 	}
 
