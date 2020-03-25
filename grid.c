@@ -19,7 +19,6 @@ void init_grid(struct grid *g)
 			x = i*dx - 0.25;
 			y = j*dy - 0.75;
 
-			/*
 			double rho;
 			if (y > 0) {
 				rho = 2;
@@ -34,7 +33,7 @@ void init_grid(struct grid *g)
 				CEL(g->prim[2],i,j) = 0.01*(1 + cos(4*PI*x))*(1 + cos(3*PI*y))/4;
 				CEL(g->prim[3],i,j) = 2.5 - GRAV*rho*y;
 			}
-			*/
+			/*
 			if (y > 0) {
 				CEL(g->prim[0],i,j) = 1;
 				CEL(g->prim[1],i,j) = 0;
@@ -44,8 +43,9 @@ void init_grid(struct grid *g)
 				CEL(g->prim[0],i,j) = 0.125;
 				CEL(g->prim[1],i,j) = 0;
 				CEL(g->prim[2],i,j) = 0;
-				CEL(g->prim[3],i,j) = 0.1;
+				CEL(g->prim[3],i,j) = 1;
 			}
+			*/
 		}
 	}
 

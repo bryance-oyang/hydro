@@ -50,10 +50,10 @@ for fnum in range(200):
 	gs = gridspec.GridSpec(1, 2)
 
 	ax = fig.add_subplot(gs[0,0])
-	pl(ax, rho, cmap="gray", vbound=[0,2])
+	pl(ax, rho, cmap="gray", vbound=[0,1])
 
 	ax = fig.add_subplot(gs[0,1])
-	pl(ax, press, cmap="gray", vbound=[0,3000])
+	pl(ax, press, cmap="gray", vbound=[0,3])
 
 	gs.tight_layout(fig)
 	#plt.show()
