@@ -13,7 +13,7 @@
 #define RHO_FLOOR 1e-6
 #define PRESS_FLOOR 1e-8
 
-#define MAX_OUT 200
+#define MAX_OUT 100
 #define MAX_EPOCH 1000000000
 #define CFL_NUM 0.36
 #define OUT_DT ((double)(OUT_TF) / (MAX_OUT - 1))
