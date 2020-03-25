@@ -4,10 +4,14 @@
 
 static inline double slope_lim(double r)
 {
-	double fabsr;
+	double b;
 
-	fabsr = fabs(r);
-	return (r + fabsr) / (1 + fabsr);
+	if (r > 0) {
+		b = 1.9;
+		return fmax(fmin(1, b*r), fmin(r, b));
+	} else {
+		return 0;
+	}
 }
 
 void reconstruct(struct grid *g, int dir)
@@ -266,6 +270,9 @@ void hllc(struct grid *g, int dir)
 		s_J = g->s_Jy;
 	}
 
+#if _OPENMP
+#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#endif /* _OPENMP */
 	for (i = 2; i < nx-1; i++) {
 		for (j = 2; j < ny-1; j++) {
 			double Lw, Uw, Mw;
@@ -280,6 +287,9 @@ void hllc(struct grid *g, int dir)
 			if (Lw == 0 && Uw == 0) {
 				for (n = 0; n < 4; n++) {
 					FEL(J[n],i,j) = 0;
+				}
+				for (m = 0; m < NSCALAR; m++) {
+					FEL(s_J[m],i,j) = 0;
 				}
 				continue;
 			}
@@ -303,6 +313,9 @@ void hllc(struct grid *g, int dir)
 						FEL(J[n],i,j) += Upress * Uv;
 					}
 				}
+				for (m = 0; m < NSCALAR; m++) {
+					FEL(s_J[m],i,j) = Uv * FEL(g->Us[m],i,j);
+				}
 				continue;
 			}
 			if (Lw >= 0) {
@@ -314,6 +327,9 @@ void hllc(struct grid *g, int dir)
 					if (n == 3) {
 						FEL(J[n],i,j) += Lpress * Lv;
 					}
+				}
+				for (m = 0; m < NSCALAR; m++) {
+					FEL(s_J[m],i,j) = Lv * FEL(g->Ls[m],i,j);
 				}
 				continue;
 			}
@@ -335,6 +351,9 @@ void hllc(struct grid *g, int dir)
 						FEL(J[n],i,j) += Mpress;
 					}
 				}
+				for (m = 0; m < NSCALAR; m++) {
+					FEL(s_J[m],i,j) = 0;
+				}
 				continue;
 			}
 
@@ -350,6 +369,10 @@ void hllc(struct grid *g, int dir)
 					FEL(J[2],i,j) = rho3 * SQR(Mw) + Mpress;
 				}
 				FEL(J[3],i,j) = (e3 + Mpress) * Mw;
+
+				for (m = 0; m < NSCALAR; m++) {
+					FEL(s_J[m],i,j) = (Uv - Uw) / (Mw - Uw) * FEL(g->Us[m],i,j);
+				}
 			} else {
 				e2 = (Lv*(Le+Lpress) - Lw*Le - Mw*Mpress) / (Mw - Lw);
 
@@ -362,13 +385,10 @@ void hllc(struct grid *g, int dir)
 					FEL(J[2],i,j) = rho2 * SQR(Mw) + Mpress;
 				}
 				FEL(J[3],i,j) = (e2 + Mpress) * Mw;
-			}
-		}
-	}
 
-	for (m = 0; m < NSCALAR; m++) {
-		for (i = 2; i < nx-1; i++) {
-			for (j = 2; j < ny-1; j++) {
+				for (m = 0; m < NSCALAR; m++) {
+					FEL(s_J[m],i,j) = (Lv - Lw) / (Mw - Lw) * FEL(g->Ls[m],i,j);
+				}
 			}
 		}
 	}

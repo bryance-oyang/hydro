@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+extern double GRAV;
+
 void init_grid(struct grid *g)
 {
 	int i, j, nx, ny;
@@ -16,36 +18,60 @@ void init_grid(struct grid *g)
 
 	for (i = 0; i < nx; i++) {
 		for (j = 0; j < ny; j++) {
-			x = i*dx - 0.25;
-			y = j*dy - 0.75;
+			x = i*dx;
+			y = j*dy;
 
-			double rho;
-			if (y > 0) {
-				rho = 2;
-				CEL(g->prim[0],i,j) = rho;
-				CEL(g->prim[1],i,j) = 0;
-				CEL(g->prim[2],i,j) = 0.01*(1 + cos(4*PI*x))*(1 + cos(3*PI*y))/4;
-				CEL(g->prim[3],i,j) = 2.5 - GRAV*rho*y;
-			} else {
-				rho = 1;
-				CEL(g->prim[0],i,j) = rho;
-				CEL(g->prim[1],i,j) = 0;
-				CEL(g->prim[2],i,j) = 0.01*(1 + cos(4*PI*x))*(1 + cos(3*PI*y))/4;
-				CEL(g->prim[3],i,j) = 2.5 - GRAV*rho*y;
+			if (KH_INSTAB) {
+				x -= 0.5;
+				y -= 0.5;
+				if (fabs(y) > 0.25) {
+					CEL(g->prim[0],i,j) = 1;
+					CEL(g->prim[1],i,j) = 0.5;
+					CEL(g->prim[2],i,j) = 0;
+					CEL(g->prim[3],i,j) = 2.5;
+				} else {
+					CEL(g->prim[0],i,j) = 2;
+					CEL(g->prim[1],i,j) = -0.5;
+					CEL(g->prim[2],i,j) = 0;
+					CEL(g->prim[3],i,j) = 2.5;
+				}
+				double pk2pk = 0.05;
+				CEL(g->prim[1],i,j) += pk2pk * (double)rand() / RAND_MAX - pk2pk / 2;
+				CEL(g->prim[2],i,j) += pk2pk * (double)rand() / RAND_MAX - pk2pk / 2;
 			}
-			/*
-			if (y > 0) {
-				CEL(g->prim[0],i,j) = 1;
-				CEL(g->prim[1],i,j) = 0;
-				CEL(g->prim[2],i,j) = 0;
-				CEL(g->prim[3],i,j) = 1;
-			} else {
-				CEL(g->prim[0],i,j) = 0.125;
-				CEL(g->prim[1],i,j) = 0;
-				CEL(g->prim[2],i,j) = 0;
-				CEL(g->prim[3],i,j) = 1;
+
+			if (RT_INSTAB) {
+				x -= 0.5;
+				y -= 0.75;
+				double rho;
+				if (y > 0) {
+					rho = 2;
+					CEL(g->prim[0],i,j) = rho;
+					CEL(g->prim[1],i,j) = 0;
+					CEL(g->prim[2],i,j) = 0.01*(1 + cos(4*PI*x))*(1 + cos(3*PI*y))/4;
+					CEL(g->prim[3],i,j) = 2.5 - GRAV*rho*y;
+				} else {
+					rho = 1;
+					CEL(g->prim[0],i,j) = rho;
+					CEL(g->prim[1],i,j) = 0;
+					CEL(g->prim[2],i,j) = 0.01*(1 + cos(4*PI*x))*(1 + cos(3*PI*y))/4;
+					CEL(g->prim[3],i,j) = 2.5 - GRAV*rho*y;
+				}
 			}
-			*/
+
+			if (SOD_SHOCK) {
+				if (i > nx/2) {
+					CEL(g->prim[0],i,j) = 1;
+					CEL(g->prim[1],i,j) = 0;
+					CEL(g->prim[2],i,j) = 0;
+					CEL(g->prim[3],i,j) = 1;
+				} else {
+					CEL(g->prim[0],i,j) = 0.125;
+					CEL(g->prim[1],i,j) = 0;
+					CEL(g->prim[2],i,j) = 0;
+					CEL(g->prim[3],i,j) = 0.1;
+				}
+			}
 		}
 	}
 

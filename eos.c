@@ -2,6 +2,8 @@
 #include "def.h"
 #include <math.h>
 
+extern double GAMMA;
+
 void eos_prim_floor(double **prim, int nx, int ny)
 {
 	int i, j;

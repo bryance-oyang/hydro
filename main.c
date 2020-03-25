@@ -7,6 +7,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+extern int NX;
+extern int NY;
+extern double DX;
+extern double DY;
+extern double OUT_TF;
+
 void output_array(char *filename, double *q, int nx, int ny)
 {
 	int i, j;
@@ -63,6 +69,8 @@ int main()
 #ifdef CDEBUG
 	feenableexcept(FE_INVALID | FE_OVERFLOW | FE_DIVBYZERO);
 #endif /* CDEBUG */
+
+	global_const();
 
 	g = alloc_grid(NX, NY, DX, DY);
 	init_grid(g);
