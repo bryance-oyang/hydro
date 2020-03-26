@@ -5,15 +5,15 @@
 #define NTHREAD 4
 #define THREAD_SCHEDULE static
 
-#define NX 128
-#define NY 128
+#define NX 50
+#define NY 50
 
 #define KH_INSTAB 0
-#define RT_INSTAB 0
+#define RT_INSTAB 1
 #define SOD_SHOCK 0
 #define BLAST 0
 #define STATIC_GRAV_TEST 0
-#define SUPERSONIC 1
+#define SUPERSONIC 0
 
 #define NSCALAR 1
 #define RHO_FLOOR 1e-6

@@ -4,11 +4,12 @@
 
 static inline double slope_lim(double r)
 {
-	double b;
+	double a, b;
 
 	if (r > 0) {
-		b = 1.8;
-		return fmax(fmin(1, b*r), fmin(r, b));
+		a = 0.92;
+		b = 1.92;
+		return fmax(fmin(a, b*r), fmin(a*r, b));
 	} else {
 		return 0;
 	}

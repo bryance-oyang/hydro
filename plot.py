@@ -10,6 +10,7 @@ from matplotlib import patches
 import matplotlib.lines as mlines
 #rc("text", usetex=True)
 rc("font", family="serif")
+rc("font", size=14)
 rc("axes", grid=True)
 rc("grid", linestyle="--")
 rc("xtick", direction="in")
@@ -27,6 +28,7 @@ xmin = param[4]
 xmax = param[5]
 ymin = param[6]
 ymax = param[7]
+img_rat = (xmax - xmin) / (ymax - ymin);
 
 for fnum in range(200):
 	print("fnum = %d" % fnum)
@@ -34,7 +36,8 @@ for fnum in range(200):
 	rho = np.transpose(np.loadtxt("data/rho_%05d.dat" % fnum))
 	press = np.transpose(np.loadtxt("data/press_%05d.dat" % fnum))
 
-	[x, y] = np.mgrid[xmin:xmax:(nx+1)*1j, ymin:ymax:(ny+1)*1j]
+	x = np.linspace(xmin, xmax, nx+1)
+	y = np.linspace(ymin, ymax, ny+1)
 
 	def pl(ax, q, cmap="viridis", vbound=None):
 		if vbound is None:
@@ -43,14 +46,14 @@ for fnum in range(200):
 		else:
 			[vmin, vmax] = vbound
 
-		im = ax.pcolormesh(x.T, y.T, q, cmap=cmap, norm=colors.Normalize(vmin=vmin, vmax=vmax))
+		im = ax.pcolormesh(x, y, q, cmap=cmap, norm=colors.Normalize(vmin=vmin, vmax=vmax))
 		ax.set_aspect(1)
 		divider = make_axes_locatable(ax)
 		cax = divider.append_axes("right", size="5%", pad=0.05)
 		cbar = plt.colorbar(im, cax=cax)
 		cbar.ax.tick_params()
 
-	fig = plt.figure(figsize=(12, 6))
+	fig = plt.figure(figsize=(15, 7.5), dpi=72)
 	gs = gridspec.GridSpec(1, 2)
 
 	ax = fig.add_subplot(gs[0,0])

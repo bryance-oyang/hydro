@@ -33,11 +33,11 @@ void global_const()
 #endif
 
 #if RT_INSTAB == 1
-	XMIN = -0.75;
-	XMAX = 0.75;
+	XMIN = -0.25;
+	XMAX = 0.25;
 	YMIN = -0.75;
 	YMAX = 0.75;
-	OUT_TF = 100;
+	OUT_TF = 12.75;
 	GAMMA = 1.4;
 	GRAV = 0.1;
 #endif
@@ -77,7 +77,7 @@ void global_const()
 	XMAX = 0.5;
 	YMIN = -0.5;
 	YMAX = 0.5;
-	OUT_TF = 2;
+	OUT_TF = 10;
 	GAMMA = 1.4;
 	GRAV = 1;
 #endif

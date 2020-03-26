@@ -31,7 +31,7 @@ static inline void periodic_boundary_right(struct grid *g)
 	for (n = 0; n < 4; n++) {
 		for (k = 0; k < 2; k++) {
 			for (j = 2; j < ny-2; j++) {
-				CEL(g->prim[0],i-k,j) = CEL(g->prim[0],3-k,j);
+				CEL(g->prim[n],i-k,j) = CEL(g->prim[n],3-k,j);
 			}
 		}
 	}

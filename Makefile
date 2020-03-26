@@ -7,7 +7,7 @@ OFLAGS=-O3 -flto -fopenmp
 CFLAGS+=-std=gnu90 -Wall -Wextra
 LDFLAGS=-lc -lm
 CDEBUG=-g -p -DCDEBUG
-DFLAGS=$(CFLAGS) -M
+DFLAGS=$(CFLAGS) -MM -MT
 
 ifdef srcdir
 VPATH=$(srcdir)
@@ -93,7 +93,7 @@ $(EXEC): $(OBJS)
 	$(CC) -S -g $(CFLAGS) -o $@ $<
 
 %.d: %.c
-	$(CC) $(DFLAGS) $< >$*.d
+	$(CC) $(DFLAGS) $*.o $< >$*.d
 
 %.h.gch: %.h
 	$(CC) -c $(CFLAGS) -o $@ $<

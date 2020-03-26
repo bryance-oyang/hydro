@@ -1,6 +1,10 @@
 #ifndef INITIAL_COND_H
 #define INITIAL_COND_H
 
+#include "eos.h"
+#include <stdlib.h>
+#include <math.h>
+
 extern double XMIN;
 extern double YMIN;
 extern double GRAV;
@@ -17,10 +21,10 @@ void init_grid(struct grid *g)
 
 	for (i = 2; i < nx-1; i++) {
 		for (j = 2; j < ny-1; j++) {
-			CEL(g->x_cc,i,j) = XMIN + (i+0.5)*dx;
-			CEL(g->y_cc,i,j) = YMIN + (j+0.5)*dy;
-			FEL(g->x_fc,i,j) = XMIN + i*dx;
-			FEL(g->y_fc,i,j) = YMIN + j*dy;
+			CEL(g->x_cc,i,j) = XMIN + (i-1.5)*dx;
+			CEL(g->y_cc,i,j) = YMIN + (j-1.5)*dy;
+			FEL(g->x_fc,i,j) = XMIN + (i-2)*dx;
+			FEL(g->y_fc,i,j) = YMIN + (j-2)*dy;
 		}
 	}
 
