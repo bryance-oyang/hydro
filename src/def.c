@@ -82,6 +82,16 @@ void global_const()
 	GRAV = 1;
 #endif
 
+#if ATMOSPHERE == 1
+	XMIN = -2e6;
+	XMAX = 2e6;
+	YMIN = 0;
+	YMAX = 8e6;
+	OUT_TF = 200;
+	GAMMA = 1.4;
+	GRAV = 980;
+#endif
+
 	XRANGE = XMAX - XMIN;
 	YRANGE = YMAX - YMIN;
 	DX = XRANGE / NX;

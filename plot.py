@@ -32,6 +32,9 @@ ymax = param[7]
 nfile = int(param[8])
 img_rat = (xmax - xmin) / (ymax - ymin);
 
+m_air =	1.204e-3 / 0.02504e21
+kB = 1.38e-16
+
 def doit(fnum):
 	print("fnum = %d" % fnum)
 	try:
@@ -62,10 +65,10 @@ def doit(fnum):
 	gs = gridspec.GridSpec(1, 2)
 
 	ax = fig.add_subplot(gs[0,0])
-	pl(ax, rho, cmap="viridis", vbound=[0,2.5])
+	pl(ax, np.log10(rho), cmap="viridis", vbound=[-9,-3])
 
 	ax = fig.add_subplot(gs[0,1])
-	pl(ax, press, cmap="inferno", vbound=[0,3])
+	pl(ax, press * m_air / (rho * kB), cmap="inferno", vbound=None)
 
 	gs.tight_layout(fig)
 	plt.savefig("img/img_%05d.png" % fnum)

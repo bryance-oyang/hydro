@@ -7,6 +7,7 @@
 
 extern double XMIN;
 extern double YMIN;
+extern double GAMMA;
 extern double GRAV;
 
 void init_grid(struct grid *g)
@@ -126,6 +127,26 @@ void init_grid(struct grid *g)
 					CEL(g->prim[1],i,j) = 0;
 					CEL(g->prim[2],i,j) = 0;
 					CEL(g->prim[3],i,j) = 1 - GRAV * rho * y;
+				}
+			}
+
+			if (ATMOSPHERE) {
+				double rho0, rho, r, R0, ndens0, ndens, m0, nrg0;
+				nrg0 = 2e18;
+				R0 = 1e5;
+				rho0 = 1.204e-3;
+				ndens0 = 2.504e19;
+				m0 = rho0 / ndens0;
+				r = sqrt(SQR(x) + SQR(y - 4.2e5));
+				ndens = ndens0 * exp(-m0 * GRAV * y / (kB * 270));
+				rho = ndens * m0;
+				CEL(g->prim[0],i,j) = rho;
+				CEL(g->prim[1],i,j) = 0;
+				CEL(g->prim[2],i,j) = 0;
+				if (r < R0) {
+					CEL(g->prim[3],i,j) = ndens * kB * 270 + (GAMMA - 1) * nrg0 / (PI * SQR(R0));
+				} else {
+					CEL(g->prim[3],i,j) = ndens * kB * 270;
 				}
 			}
 		}

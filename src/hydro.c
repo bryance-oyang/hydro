@@ -18,6 +18,11 @@ void boundary(struct grid *g)
 		periodic_boundary_right(g);
 		reflecting_boundary_bot(g);
 		reflecting_boundary_top(g);
+	} else if (ATMOSPHERE) {
+		smooth_boundary_left(g);
+		smooth_boundary_right(g);
+		reflecting_boundary_bot(g);
+		smooth_boundary_top(g);
 	} else {
 		reflecting_boundary_left(g);
 		reflecting_boundary_right(g);

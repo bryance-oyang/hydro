@@ -5,8 +5,8 @@
 #define NTHREAD 4
 #define THREAD_SCHEDULE static
 
-#define NX 400
-#define NY 600
+#define NX 100
+#define NY 200
 
 #define KH_INSTAB 0
 #define RT_INSTAB 0
@@ -14,10 +14,11 @@
 #define BLAST 0
 #define STATIC_GRAV_TEST 0
 #define SUPERSONIC 0
+#define ATMOSPHERE 1
 
 #define NSCALAR 1
-#define RHO_FLOOR 1e-6
-#define PRESS_FLOOR 1e-8
+#define RHO_FLOOR 1e-8
+#define PRESS_FLOOR 1e-10
 
 #define MAX_OUT 100
 #define MAX_EPOCH 1000000000
@@ -27,6 +28,7 @@
 #define BUF_LEN 1024
 
 #define PI 3.1415926535897932384626433
+#define kB 1.380649e-16
 #define SQR(x) ((x)*(x))
 
 #define CEL(a,i,j) ((a)[(i)*ny + (j)])
