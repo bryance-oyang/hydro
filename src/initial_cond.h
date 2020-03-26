@@ -82,16 +82,18 @@ void init_grid(struct grid *g)
 			}
 
 			if (BLAST) {
-				if (i == nx/2 && j == ny/2) {
-					CEL(g->prim[0],i,j) = 100;
+				double r;
+				r = sqrt(SQR(x) + SQR(y));
+				if (r < 0.1) {
+					CEL(g->prim[0],i,j) = 1;
 					CEL(g->prim[1],i,j) = 0;
 					CEL(g->prim[2],i,j) = 0;
-					CEL(g->prim[3],i,j) = 100;
+					CEL(g->prim[3],i,j) = 10;
 				} else {
 					CEL(g->prim[0],i,j) = 1;
 					CEL(g->prim[1],i,j) = 0;
 					CEL(g->prim[2],i,j) = 0;
-					CEL(g->prim[3],i,j) = 1;
+					CEL(g->prim[3],i,j) = 0.1;
 				}
 			}
 

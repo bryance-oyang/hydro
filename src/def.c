@@ -55,10 +55,10 @@ void global_const()
 #if BLAST == 1
 	XMIN = -0.5;
 	XMAX = 0.5;
-	YMIN = -0.5;
-	YMAX = 0.5;
-	OUT_TF = 2;
-	GAMMA = 1.4;
+	YMIN = -0.75;
+	YMAX = 0.75;
+	OUT_TF = 1.5;
+	GAMMA = 5.0/3.0;
 	GRAV = 0;
 #endif
 

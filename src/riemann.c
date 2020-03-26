@@ -10,7 +10,7 @@ static inline double slope_lim(double r)
 
 	if (r > 0) {
 		a = 1;
-		b = 1.6;
+		b = 1.3;
 		return fmax(fmin(a, b*r), fmin(a*r, b));
 	} else {
 		return 0;

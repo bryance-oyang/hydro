@@ -8,7 +8,7 @@ extern double GRAV;
 
 void boundary(struct grid *g)
 {
-	if (KH_INSTAB || SUPERSONIC) {
+	if (KH_INSTAB || SUPERSONIC || BLAST) {
 		periodic_boundary_left(g);
 		periodic_boundary_right(g);
 		periodic_boundary_bot(g);

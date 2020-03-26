@@ -5,10 +5,10 @@
 #define NTHREAD 4
 #define THREAD_SCHEDULE static
 
-#define NX 512
-#define NY 512
+#define NX 400
+#define NY 600
 
-#define KH_INSTAB 1
+#define KH_INSTAB 0
 #define RT_INSTAB 0
 #define SOD_SHOCK 0
 #define BLAST 0
