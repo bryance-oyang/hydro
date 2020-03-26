@@ -84,6 +84,6 @@ void global_const()
 
 	XRANGE = XMAX - XMIN;
 	YRANGE = YMAX - YMIN;
-	DX = XRANGE / (NX - 4);
-	DY = YRANGE / (NY - 4);
+	DX = XRANGE / NX;
+	DY = YRANGE / NY;
 }

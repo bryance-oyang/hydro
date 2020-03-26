@@ -18,6 +18,7 @@ rc("ytick", direction="in")
 rc("savefig", format="pdf", bbox="tight")
 import numpy as np
 import os
+import multiprocessing
 
 param = np.loadtxt("data/param.dat")
 nx = param[0]
@@ -28,16 +29,17 @@ xmin = param[4]
 xmax = param[5]
 ymin = param[6]
 ymax = param[7]
+nfile = int(param[8])
 img_rat = (xmax - xmin) / (ymax - ymin);
 
-for fnum in range(200):
+def doit(fnum):
 	print("fnum = %d" % fnum)
-
 	rho = np.transpose(np.loadtxt("data/rho_%05d.dat" % fnum))
 	press = np.transpose(np.loadtxt("data/press_%05d.dat" % fnum))
 
 	x = np.linspace(xmin, xmax, nx+1)
 	y = np.linspace(ymin, ymax, ny+1)
+	[x, y] = np.meshgrid(x, y, indexing="xy")
 
 	def pl(ax, q, cmap="viridis", vbound=None):
 		if vbound is None:
@@ -63,6 +65,8 @@ for fnum in range(200):
 	pl(ax, press/rho, cmap="inferno", vbound=[0,3])
 
 	gs.tight_layout(fig)
-	#plt.show()
 	plt.savefig("img/img_%05d.png" % fnum)
 	plt.close()
+
+pool = multiprocessing.Pool(8)
+pool.map(doit, range(0, nfile))

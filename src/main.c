@@ -48,14 +48,15 @@ void output(struct grid *g, int nout)
 			exit(EXIT_FAILURE);
 		}
 
-		fprintf(f, "%d\n", g->nx-4);
-		fprintf(f, "%d\n", g->ny-4);
+		fprintf(f, "%d\n", NX);
+		fprintf(f, "%d\n", NY);
 		fprintf(f, "%g\n", g->dx);
 		fprintf(f, "%g\n", g->dy);
 		fprintf(f, "%g\n", XMIN);
 		fprintf(f, "%g\n", XMAX);
 		fprintf(f, "%g\n", YMIN);
 		fprintf(f, "%g\n", YMAX);
+		fprintf(f, "%d\n", MAX_OUT);
 
 		fclose(f);
 	}
@@ -79,7 +80,7 @@ int main()
 
 	global_const();
 
-	g = alloc_grid(NX, NY, DX, DY);
+	g = alloc_grid(NX+4, NY+4, DX, DY);
 	init_grid(g);
 	boundary(g);
 
