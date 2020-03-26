@@ -4,6 +4,7 @@
 #endif /* CDEBUG */
 
 #include "hydro.h"
+#include "initial_cond.h"
 #include <stdio.h>
 #include <stdlib.h>
 

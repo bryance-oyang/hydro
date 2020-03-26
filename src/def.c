@@ -27,7 +27,7 @@ void global_const()
 	XMAX = 0.5;
 	YMIN = -0.5;
 	YMAX = 0.5;
-	OUT_TF = 5;
+	OUT_TF = 1;
 	GAMMA = 1.4;
 	GRAV = 0;
 #endif

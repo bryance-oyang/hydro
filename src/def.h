@@ -5,8 +5,8 @@
 #define NTHREAD 4
 #define THREAD_SCHEDULE static
 
-#define NX 64
-#define NY 64
+#define NX 128
+#define NY 128
 
 #define KH_INSTAB 0
 #define RT_INSTAB 0

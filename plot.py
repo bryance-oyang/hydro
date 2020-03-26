@@ -57,7 +57,7 @@ for fnum in range(200):
 	pl(ax, rho, cmap="viridis", vbound=[0,2.5])
 
 	ax = fig.add_subplot(gs[0,1])
-	pl(ax, press / rho, cmap="inferno", vbound=[0,2])
+	pl(ax, press/rho, cmap="inferno", vbound=[0,3])
 
 	gs.tight_layout(fig)
 	#plt.show()
