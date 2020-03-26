@@ -34,8 +34,11 @@ img_rat = (xmax - xmin) / (ymax - ymin);
 
 def doit(fnum):
 	print("fnum = %d" % fnum)
-	rho = np.transpose(np.loadtxt("data/rho_%05d.dat" % fnum))
-	press = np.transpose(np.loadtxt("data/press_%05d.dat" % fnum))
+	try:
+		rho = np.transpose(np.loadtxt("data/rho_%05d.dat" % fnum))
+		press = np.transpose(np.loadtxt("data/press_%05d.dat" % fnum))
+	except:
+		return
 
 	x = np.linspace(xmin, xmax, nx+1)
 	y = np.linspace(ymin, ymax, ny+1)
@@ -62,7 +65,7 @@ def doit(fnum):
 	pl(ax, rho, cmap="viridis", vbound=[0,2.5])
 
 	ax = fig.add_subplot(gs[0,1])
-	pl(ax, press/rho, cmap="inferno", vbound=[0,3])
+	pl(ax, press, cmap="inferno", vbound=[0,3])
 
 	gs.tight_layout(fig)
 	plt.savefig("img/img_%05d.png" % fnum)

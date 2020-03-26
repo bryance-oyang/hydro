@@ -2,13 +2,20 @@
 #include "eos.h"
 #include <math.h>
 
+extern double GRAV;
+
 static inline double slope_lim(double r)
 {
 	double a, b;
 
 	if (r > 0) {
-		a = 0.92;
-		b = 1.92;
+		if (GRAV != 0) {
+			a = 0.92;
+			b = 1.92;
+		} else {
+			a = 1;
+			b = 1.6;
+		}
 		return fmax(fmin(a, b*r), fmin(a*r, b));
 	} else {
 		return 0;
