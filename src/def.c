@@ -9,6 +9,7 @@ double YRANGE;
 double DX;
 double DY;
 double OUT_TF;
+double OUT_DT;
 double GAMMA;
 double GRAV;
 
@@ -27,7 +28,7 @@ void global_const()
 	XMAX = 27;
 	YMIN = -27;
 	YMAX = 27;
-	OUT_TF = 4.0;
+	OUT_TF = 0.72;
 	GAMMA = 5.0/3.0;
 	GRAV = 0;
 #endif
@@ -102,6 +103,7 @@ void global_const()
 	GRAV = 980;
 #endif
 
+	OUT_DT = (OUT_TF / ((MAX_OUT) - 1));
 	XRANGE = XMAX - XMIN;
 	YRANGE = YMAX - YMIN;
 	DX = XRANGE / NX;

@@ -15,6 +15,7 @@ extern double YMAX;
 extern double DX;
 extern double DY;
 extern double OUT_TF;
+extern double OUT_DT;
 
 void output_array(char *filename, double *q, int nx, int ny)
 {

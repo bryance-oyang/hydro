@@ -52,11 +52,11 @@ static double potential(double x, double y)
 		spin = -0.5 * (SQR(x - BIN_COM) + SQR(y)) * SQR(BIN_OMEGA);
 		return grav1 + grav2 + spin;
 	} else {
-		return -GRAV * y;
+		return GRAV * y;
 	}
 }
 
-static void compute_src(struct grid *g)
+static void compute_src(struct grid *g, int step)
 {
 	int i, j, nx, ny;
 	int m;
@@ -68,7 +68,7 @@ static void compute_src(struct grid *g)
 	dy = g->dy;
 
 #if _OPENMP
-#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
 	for (i = 2; i < nx-2; i++) {
 		for (j = 2; j < ny-2; j++) {
@@ -100,17 +100,39 @@ static void compute_src(struct grid *g)
 					+ CEL(g->cons[2],i,j) * (potential(x, Ly) - potential(x, Uy)) / dy;
 			}
 
-			if (BINARY) {
-				CEL(g->src[1],i,j) += 2 * CEL(g->prim[0],i,j) * CEL(g->prim[2],i,j) * BIN_OMEGA;
-				CEL(g->src[2],i,j) -= 2 * CEL(g->prim[0],i,j) * CEL(g->prim[1],i,j) * BIN_OMEGA;
+			if (step == 0) {
+				int dir;
+
+				for (dir = 0; dir < 2; dir++) {
+					double trial_dt, a, v, sqrt_part;
+					double ds;
+
+					if (dir == 0) {
+						ds = dx;
+					} else {
+						ds = dy;
+					}
+
+					a = CEL(g->src[1+dir],i,j) / CEL(g->prim[0],i,j);
+					v = CEL(g->prim[1+dir],i,j);
+					sqrt_part = sqrt(2*a*ds + SQR(v));
+					trial_dt = fmin(fabs((-v - sqrt_part) / a), fabs((-v + sqrt_part) / a));
+
+					if (g->dt > trial_dt) {
+#if _OPENMP
+#pragma omp atomic write
+#endif /* _OPENMP */
+						g->dt = trial_dt;
+					}
+				}
 			}
 		}
 	}
 
-#if _OPENMP
-#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
-#endif /* _OPENMP */
 	for (m = 0; m < NSCALAR; m++) {
+#if _OPENMP
+#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#endif /* _OPENMP */
 		for (i = 2; i < nx-2; i++) {
 			for (j = 2; j < ny-2; j++) {
 				CEL(g->s_src[m],i,j) = 0;
@@ -129,7 +151,7 @@ static void copy_gen(struct grid *g)
 
 	for (n = 0; n < 4; n++) {
 #if _OPENMP
-#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
 		for (i = 2; i < nx-2; i++) {
 			for (j = 2; j < ny-2; j++) {
@@ -141,7 +163,7 @@ static void copy_gen(struct grid *g)
 
 	for (m = 0; m < NSCALAR; m++) {
 #if _OPENMP
-#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
 		for (i = 2; i < nx-2; i++) {
 			for (j = 2; j < ny-2; j++) {
@@ -172,7 +194,7 @@ static void add_flux_div_src(struct grid *g, int step)
 
 	for (n = 0; n < 4; n++) {
 #if _OPENMP
-#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
 		for (i = 2; i < nx-2; i++) {
 			for (j = 2; j < ny-2; j++) {
@@ -184,9 +206,31 @@ static void add_flux_div_src(struct grid *g, int step)
 		}
 	}
 
+	if (BINARY) {
+#if _OPENMP
+#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#endif /* _OPENMP */
+		for (i = 2; i < nx-2; i++) {
+			for (j = 2; j < ny-2; j++) {
+				double rho, vx, vy, dtomega;
+
+				dtomega = dt * BIN_OMEGA;
+				rho = CEL(g->cons[0],i,j);
+				vx = CEL(g->cons[1],i,j) / rho;
+				vy = CEL(g->cons[2],i,j) / rho;
+				CEL(g->cons[1],i,j) = rho
+					* ((1 - SQR(dtomega))*vx + 2*dtomega*vy)
+					/ (1 + SQR(dtomega));
+				CEL(g->cons[2],i,j) = rho
+					* (-2*dtomega*vx + (1 - SQR(dtomega))*vy)
+					/ (1 + SQR(dtomega));
+			}
+		}
+	}
+
 	for (m = 0; m < NSCALAR; m++) {
 #if _OPENMP
-#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
 		for (i = 2; i < nx-2; i++) {
 			for (j = 2; j < ny-2; j++) {
@@ -232,7 +276,7 @@ void advance_timestep(struct grid *g)
 		eos_sound_speed(g);
 		compute_Jx(g, step);
 		compute_Jy(g, step);
-		compute_src(g);
+		compute_src(g, step);
 		if (step == 0) {
 			g->dt *= CFL_NUM;
 		}

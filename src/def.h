@@ -2,16 +2,16 @@
 #define DEF_H
 
 #define HLLC 1
-#define FANCY_POT_NRG 0
+#define FANCY_POT_NRG 1
 #define NTHREAD 4
 #define THREAD_SCHEDULE static
 
-#define NX 128
-#define NY 128
+#define NX 100
+#define NY 300
 
-#define BINARY 1
+#define BINARY 0
 #define KH_INSTAB 0
-#define RT_INSTAB 0
+#define RT_INSTAB 1
 #define SOD_SHOCK 0
 #define BLAST 0
 #define STATIC_GRAV_TEST 0
@@ -21,15 +21,10 @@
 #define NSCALAR 1
 #define RHO_FLOOR 1e-6
 #define PRESS_FLOOR 1e-10
-#if BINARY == 1
-#define PRESS_RHO_CEIL 100
-#else
 #define PRESS_RHO_CEIL 0
-#endif
 
 #define MAX_OUT 100
 #define MAX_EPOCH 1000000000000
-#define OUT_DT ((double)(OUT_TF) / (MAX_OUT - 1))
 #define CFL_NUM 0.43
 
 #define BUF_LEN 1024

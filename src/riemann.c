@@ -4,17 +4,30 @@
 
 extern double GRAV;
 
-static inline double slope_lim(double r)
+static inline double grid_noise_lim(double r)
 {
 	double a, b;
 
 	if (r > 0) {
 		a = 1;
-		b = 1.3;
+		b = 1.36;
 		return fmax(fmin(a, b*r), fmin(a*r, b));
 	} else {
 		return 0;
 	}
+}
+
+static inline double vl_lim(double r)
+{
+	double fabsr;
+
+	fabsr = fabs(r);
+	return (r + fabsr) / (1 + fabsr);
+}
+
+static inline double slope_lim(double r)
+{
+	return vl_lim(r);
 }
 
 void reconstruct(struct grid *g, int dir)
@@ -36,7 +49,7 @@ void reconstruct(struct grid *g, int dir)
 
 	for (n = 0; n < 4; n++) {
 #if _OPENMP
-#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
 		for (i = 1; i < nx-1; i++) {
 			for (j = 1; j < ny-1; j++) {
@@ -64,7 +77,7 @@ void reconstruct(struct grid *g, int dir)
 
 	for (m = 0; m < NSCALAR; m++) {
 #if _OPENMP
-#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
 		for (i = 1; i < nx-1; i++) {
 			for (j = 1; j < ny-1; j++) {
@@ -172,7 +185,7 @@ void hlle(struct grid *g, int dir)
 
 	for (n = 0; n < 4; n++) {
 #if _OPENMP
-#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
 		for (i = 2; i < nx-1; i++) {
 			for (j = 2; j < ny-1; j++) {
@@ -221,7 +234,7 @@ void hlle(struct grid *g, int dir)
 
 	for (m = 0; m < NSCALAR; m++) {
 #if _OPENMP
-#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
 		for (i = 2; i < nx-1; i++) {
 			for (j = 2; j < ny-1; j++) {
@@ -259,7 +272,6 @@ void hlle(struct grid *g, int dir)
 void hllc(struct grid *g, int dir)
 {
 	int i, j, nx, ny;
-	int m, n;
 	double **J, **s_J;
 
 	nx = g->nx;
@@ -274,10 +286,11 @@ void hllc(struct grid *g, int dir)
 	}
 
 #if _OPENMP
-#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
 	for (i = 2; i < nx-1; i++) {
 		for (j = 2; j < ny-1; j++) {
+			int m, n;
 			double Lw, Uw, Mw;
 			double Lv, Uv;
 			double Lpress, Upress, Mpress;

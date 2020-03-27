@@ -9,7 +9,7 @@ void eos_prim_floor(double **prim, int nx, int ny)
 	int i, j;
 
 #if _OPENMP
-#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
 	for (i = 0; i < nx; i++) {
 		for (j = 0; j < ny; j++) {
@@ -36,7 +36,7 @@ void eos_prim_to_cons(double **prim, double **cons, int nx, int
 	int i, j;
 
 #if _OPENMP
-#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
 	for (i = 0; i < nx; i++) {
 		for (j = 0; j < ny; j++) {
@@ -61,7 +61,7 @@ void eos_cons_to_prim(double **cons, double **prim, int nx, int
 	int i, j;
 
 #if _OPENMP
-#pragma omp parallel for simd num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
+#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
 	for (i = 0; i < nx; i++) {
 		for (j = 0; j < ny; j++) {
