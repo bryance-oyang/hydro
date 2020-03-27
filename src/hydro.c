@@ -3,6 +3,7 @@
 #include "riemann.h"
 #include "boundary.h"
 #include <float.h>
+#include <math.h>
 
 extern double GRAV;
 
@@ -23,6 +24,11 @@ void boundary(struct grid *g)
 		smooth_boundary_right(g);
 		reflecting_boundary_bot(g);
 		smooth_boundary_top(g);
+	} else if (BINARY) {
+		smooth_boundary_left(g);
+		smooth_boundary_right(g);
+		smooth_boundary_bot(g);
+		smooth_boundary_top(g);
 	} else {
 		reflecting_boundary_left(g);
 		reflecting_boundary_right(g);
@@ -33,7 +39,21 @@ void boundary(struct grid *g)
 
 static double potential(double x, double y)
 {
-	return -GRAV * y;
+	if (BINARY) {
+		double r, grav1, grav2, spin;
+
+		r = sqrt(SQR(x) + SQR(y));
+		if (r <= M1_CUTOFF) {
+			grav1 = -GM1 / M1_CUTOFF;
+		} else {
+			grav1 = -GM1 / sqrt(SQR(x) + SQR(y));
+		}
+		grav2 = -GM2 / sqrt(SQR(x - BIN_SEP) + SQR(y));
+		spin = -0.5 * (SQR(x - BIN_COM) + SQR(y)) * SQR(BIN_OMEGA);
+		return grav1 + grav2 + spin;
+	} else {
+		return -GRAV * y;
+	}
 }
 
 static void compute_src(struct grid *g)
@@ -71,9 +91,19 @@ static void compute_src(struct grid *g)
 			pot_cc = potential(x, y);
 
 			CEL(g->src[0],i,j) = 0;
-			CEL(g->src[1],i,j) = 0;
-			CEL(g->src[2],i,j) = -GRAV * CEL(g->prim[0],i,j);
-			CEL(g->src[3],i,j) = pot_cc * div_rhov - div_rhovpot;
+			CEL(g->src[1],i,j) = CEL(g->prim[0],i,j) * (potential(Lx, y) - potential(Ux, y)) / dx;
+			CEL(g->src[2],i,j) = CEL(g->prim[0],i,j) * (potential(x, Ly) - potential(x, Uy)) / dy;
+			if (FANCY_POT_NRG) {
+				CEL(g->src[3],i,j) = pot_cc * div_rhov - div_rhovpot;
+			} else {
+				CEL(g->src[3],i,j) = CEL(g->cons[1],i,j) * (potential(Lx, y) - potential(Ux, y)) / dx
+					+ CEL(g->cons[2],i,j) * (potential(x, Ly) - potential(x, Uy)) / dy;
+			}
+
+			if (BINARY) {
+				CEL(g->src[1],i,j) += 2 * CEL(g->prim[0],i,j) * CEL(g->prim[2],i,j) * BIN_OMEGA;
+				CEL(g->src[2],i,j) -= 2 * CEL(g->prim[0],i,j) * CEL(g->prim[1],i,j) * BIN_OMEGA;
+			}
 		}
 	}
 

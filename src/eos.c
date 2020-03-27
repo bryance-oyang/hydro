@@ -20,6 +20,12 @@ void eos_prim_floor(double **prim, int nx, int ny)
 			if (CEL(prim[3],i,j) < PRESS_FLOOR) {
 				CEL(prim[3],i,j) = PRESS_FLOOR;
 			}
+
+			if (PRESS_RHO_CEIL > 0) {
+				if (CEL(prim[3],i,j) / CEL(prim[0],i,j) > PRESS_RHO_CEIL) {
+					CEL(prim[3],i,j) = CEL(prim[0],i,j) * PRESS_RHO_CEIL;
+				}
+			}
 		}
 	}
 }

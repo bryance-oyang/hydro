@@ -34,6 +34,28 @@ void init_grid(struct grid *g)
 			x = CEL(g->x_cc,i,j);
 			y = CEL(g->y_cc,i,j);
 
+			if (BINARY) {
+				double rl, rr;
+				rl = sqrt(SQR(x - 26) + SQR(y));
+				rr = sqrt(SQR(x + 26) + SQR(y));
+				if (rl <= 4) {
+					CEL(g->prim[0],i,j) = 1e-4;
+					CEL(g->prim[1],i,j) = 0;
+					CEL(g->prim[2],i,j) = 0;
+					CEL(g->prim[3],i,j) = 1e-4;
+				} else if (i == 2 && j == 2) {
+					CEL(g->prim[0],i,j) = 3e-5;
+					CEL(g->prim[1],i,j) = -30;
+					CEL(g->prim[2],i,j) = 0;
+					CEL(g->prim[3],i,j) = 3e-5;
+				} else {
+					CEL(g->prim[0],i,j) = RHO_FLOOR;
+					CEL(g->prim[1],i,j) = 0;
+					CEL(g->prim[2],i,j) = 0;
+					CEL(g->prim[3],i,j) = PRESS_FLOOR;
+				}
+			}
+
 			if (KH_INSTAB) {
 				if (fabs(y) > 0.25) {
 					CEL(g->prim[0],i,j) = 1;

@@ -68,7 +68,8 @@ def doit(fnum):
 	pl(ax, np.log10(rho), cmap="viridis", vbound=[-9,-3])
 
 	ax = fig.add_subplot(gs[0,1])
-	pl(ax, press * m_air / (rho * kB), cmap="inferno", vbound=None)
+	#pl(ax, press * m_air / (rho * kB), cmap="inferno", vbound=None)
+	pl(ax, press / rho, cmap="inferno", vbound=None)
 
 	gs.tight_layout(fig)
 	plt.savefig("img/img_%05d.png" % fnum)

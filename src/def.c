@@ -22,6 +22,16 @@ void global_const()
 	GAMMA = 1.4;
 	GRAV = 0;
 
+#if BINARY == 1
+	XMIN = -27;
+	XMAX = 27;
+	YMIN = -27;
+	YMAX = 27;
+	OUT_TF = 4.0;
+	GAMMA = 5.0/3.0;
+	GRAV = 0;
+#endif
+
 #if KH_INSTAB == 1
 	XMIN = -0.5;
 	XMAX = 0.5;
@@ -83,11 +93,11 @@ void global_const()
 #endif
 
 #if ATMOSPHERE == 1
-	XMIN = -2e6;
-	XMAX = 2e6;
+	XMIN = -4e6;
+	XMAX = 4e6;
 	YMIN = 0;
 	YMAX = 8e6;
-	OUT_TF = 200;
+	OUT_TF = 400;
 	GAMMA = 1.4;
 	GRAV = 980;
 #endif
