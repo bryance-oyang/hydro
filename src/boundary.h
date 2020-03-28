@@ -1,6 +1,8 @@
 #ifndef BOUNDARY_H
 #define BOUNDARY_H
 
+#include <math.h>
+
 static inline void periodic_boundary_left(struct grid *g)
 {
 	int i, j, k, n;
@@ -215,6 +217,81 @@ static inline void reflecting_boundary_top(struct grid *g)
 			CEL(g->prim[1],i,j-k) = CEL(g->prim[1],i,j-3+k);
 			CEL(g->prim[2],i,j-k) = -1 * CEL(g->prim[2],i,j-3+k);
 			CEL(g->prim[3],i,j-k) = CEL(g->prim[3],i,j-3+k);
+		}
+	}
+}
+
+static inline void empty_boundary_left(struct grid *g)
+{
+	int i, j, k;
+	int ny;
+
+	ny = g->ny;
+
+	i = 0;
+	for (k = 0; k < 2; k++) {
+		for (j = 2; j < ny-2; j++) {
+			CEL(g->prim[0],i+k,j) = RHO_FLOOR;
+			CEL(g->prim[1],i+k,j) = 0;
+			CEL(g->prim[2],i+k,j) = 0;
+			CEL(g->prim[3],i+k,j) = PRESS_FLOOR;
+		}
+	}
+}
+
+static inline void empty_boundary_right(struct grid *g)
+{
+	int i, j, k;
+	int nx, ny;
+
+	nx = g->nx;
+	ny = g->ny;
+
+	i = nx-1;
+	for (k = 0; k < 2; k++) {
+		for (j = 2; j < ny-2; j++) {
+			CEL(g->prim[0],i-k,j) = RHO_FLOOR;
+			CEL(g->prim[1],i-k,j) = 0;
+			CEL(g->prim[2],i-k,j) = 0;
+			CEL(g->prim[3],i-k,j) = PRESS_FLOOR;
+		}
+	}
+}
+
+static inline void empty_boundary_bot(struct grid *g)
+{
+	int i, j, k;
+	int nx, ny;
+
+	nx = g->nx;
+	ny = g->ny;
+
+	j = 0;
+	for (i = 2; i < nx-2; i++) {
+		for (k = 0; k < 2; k++) {
+			CEL(g->prim[0],i,j+k) = RHO_FLOOR;
+			CEL(g->prim[1],i,j+k) = 0;
+			CEL(g->prim[2],i,j+k) = 0;
+			CEL(g->prim[3],i,j+k) = PRESS_FLOOR;
+		}
+	}
+}
+
+static inline void empty_boundary_top(struct grid *g)
+{
+	int i, j, k;
+	int nx, ny;
+
+	nx = g->nx;
+	ny = g->ny;
+
+	j = ny-1;
+	for (i = 2; i < nx-2; i++) {
+		for (k = 0; k < 2; k++) {
+			CEL(g->prim[0],i,j-k) = RHO_FLOOR;
+			CEL(g->prim[1],i,j-k) = 0;
+			CEL(g->prim[2],i,j-k) = 0;
+			CEL(g->prim[3],i,j-k) = PRESS_FLOOR;
 		}
 	}
 }

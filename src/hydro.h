@@ -3,7 +3,7 @@
 
 #include "grid.h"
 
-void boundary(struct grid *g);
+void boundary(struct grid *g, int step);
 void advance_timestep(struct grid *g);
 
 #endif /* HYDRO_H */

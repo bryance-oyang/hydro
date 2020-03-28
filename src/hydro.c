@@ -2,12 +2,14 @@
 #include "eos.h"
 #include "riemann.h"
 #include "boundary.h"
+#include "binary.h"
 #include <float.h>
 #include <math.h>
 
+extern double GAMMA;
 extern double GRAV;
 
-void boundary(struct grid *g)
+void boundary(struct grid *g, int step)
 {
 	if (KH_INSTAB || SUPERSONIC || BLAST) {
 		periodic_boundary_left(g);
@@ -25,10 +27,11 @@ void boundary(struct grid *g)
 		reflecting_boundary_bot(g);
 		smooth_boundary_top(g);
 	} else if (BINARY) {
-		smooth_boundary_left(g);
-		smooth_boundary_right(g);
-		smooth_boundary_bot(g);
-		smooth_boundary_top(g);
+		binary_boundary(g, step);
+		empty_boundary_left(g);
+		empty_boundary_right(g);
+		empty_boundary_bot(g);
+		empty_boundary_top(g);
 	} else {
 		reflecting_boundary_left(g);
 		reflecting_boundary_right(g);
@@ -206,28 +209,6 @@ static void add_flux_div_src(struct grid *g, int step)
 		}
 	}
 
-	if (BINARY) {
-#if _OPENMP
-#pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
-#endif /* _OPENMP */
-		for (i = 2; i < nx-2; i++) {
-			for (j = 2; j < ny-2; j++) {
-				double rho, vx, vy, dtomega;
-
-				dtomega = dt * BIN_OMEGA;
-				rho = CEL(g->cons[0],i,j);
-				vx = CEL(g->cons[1],i,j) / rho;
-				vy = CEL(g->cons[2],i,j) / rho;
-				CEL(g->cons[1],i,j) = rho
-					* ((1 - SQR(dtomega))*vx + 2*dtomega*vy)
-					/ (1 + SQR(dtomega));
-				CEL(g->cons[2],i,j) = rho
-					* (-2*dtomega*vx + (1 - SQR(dtomega))*vy)
-					/ (1 + SQR(dtomega));
-			}
-		}
-	}
-
 	for (m = 0; m < NSCALAR; m++) {
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
@@ -282,7 +263,8 @@ void advance_timestep(struct grid *g)
 		}
 		add_flux_div_src(g, step);
 		eos_cons_to_prim(g->cons, g->prim, g->nx, g->ny);
-		boundary(g);
+		eos_prim_floor(g->prim, g->nx, g->ny);
+		boundary(g, step);
 		eos_prim_floor(g->prim, g->nx, g->ny);
 		eos_prim_to_cons(g->prim, g->cons, g->nx, g->ny);
 	}

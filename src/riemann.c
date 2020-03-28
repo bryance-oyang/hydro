@@ -27,7 +27,11 @@ static inline double vl_lim(double r)
 
 static inline double slope_lim(double r)
 {
-	return vl_lim(r);
+	if (RECONSTRUCT) {
+		return vl_lim(r);
+	} else {
+		return 0;
+	}
 }
 
 void reconstruct(struct grid *g, int dir)
@@ -131,26 +135,38 @@ void wavespeed(struct grid *g, int step, int dir)
 
 	for (i = 2; i < nx-1; i++) {
 		for (j = 2; j < ny-1; j++) {
-			double sqrt_Lrho, sqrt_Urho, Lmom, Umom;
+			double sqrt_Lrho, sqrt_Urho, Lmom, Umom, Lv, Uv;
 			double Lcs, Ucs, cs;
 			double avg_vel;
 			double Lw, Uw;
 			double trial_dt;
 
-			sqrt_Lrho = sqrt(FEL(g->Lcons[0],i,j));
-			Lmom = FEL(g->Lcons[1+dir],i,j);
-			sqrt_Urho = sqrt(FEL(g->Ucons[0],i,j));
-			Umom = FEL(g->Ucons[1+dir],i,j);
+			if (ROE_WAVESPEED) {
+				sqrt_Lrho = sqrt(FEL(g->Lcons[0],i,j));
+				Lmom = FEL(g->Lcons[1+dir],i,j);
+				sqrt_Urho = sqrt(FEL(g->Ucons[0],i,j));
+				Umom = FEL(g->Ucons[1+dir],i,j);
 
-			Lcs = CEL(g->cs,i-di,j-dj);
-			Ucs = CEL(g->cs,i,j);
-			cs = fmax(Lcs, Ucs);
-			avg_vel = (Lmom/sqrt_Lrho + Umom/sqrt_Urho) / (sqrt_Lrho + sqrt_Urho);
+				Lcs = CEL(g->cs,i-di,j-dj);
+				Ucs = CEL(g->cs,i,j);
+				cs = fmax(Lcs, Ucs);
+				avg_vel = (Lmom/sqrt_Lrho + Umom/sqrt_Urho) / (sqrt_Lrho + sqrt_Urho);
 
-			Lw = avg_vel - cs;
-			Uw = avg_vel + cs;
-			FEL(g->Lw,i,j) = Lw;
-			FEL(g->Uw,i,j) = Uw;
+				Lw = avg_vel - cs;
+				Uw = avg_vel + cs;
+				FEL(g->Lw,i,j) = Lw;
+				FEL(g->Uw,i,j) = Uw;
+			} else {
+				Lv = FEL(g->Lprim[1+dir],i,j);
+				Uv = FEL(g->Uprim[1+dir],i,j);
+				Lcs = CEL(g->cs,i-di,j-dj);
+				Ucs = CEL(g->cs,i,j);
+
+				Lw = fmin(Lv - Lcs, Uv - Ucs);
+				Uw = fmax(Lv + Lcs, Uv + Ucs);
+				FEL(g->Lw,i,j) = Lw;
+				FEL(g->Uw,i,j) = Uw;
+			}
 
 			if (step == 0) {
 				trial_dt = du / fabs(Lw);

@@ -2,6 +2,7 @@
 #define INITIAL_COND_H
 
 #include "eos.h"
+#include "binary.h"
 #include <stdlib.h>
 #include <math.h>
 
@@ -35,24 +36,19 @@ void init_grid(struct grid *g)
 			y = CEL(g->y_cc,i,j);
 
 			if (BINARY) {
-				double rl, rr;
-				rl = sqrt(SQR(x - 26) + SQR(y));
-				rr = sqrt(SQR(x + 26) + SQR(y));
-				if (rl <= 4) {
-					CEL(g->prim[0],i,j) = 1e-4;
+				double r;
+
+				r = sqrt(SQR(x) + SQR(y));
+				if (r <= M1_CUTOFF) {
+					CEL(g->prim[0],i,j) = 10;
 					CEL(g->prim[1],i,j) = 0;
 					CEL(g->prim[2],i,j) = 0;
-					CEL(g->prim[3],i,j) = 1e-4;
-				} else if (i == 2 && j == 2) {
-					CEL(g->prim[0],i,j) = 3e-5;
-					CEL(g->prim[1],i,j) = -30;
-					CEL(g->prim[2],i,j) = 0;
-					CEL(g->prim[3],i,j) = 3e-5;
+					CEL(g->prim[3],i,j) = bin_press(M1_CUTOFF);
 				} else {
-					CEL(g->prim[0],i,j) = RHO_FLOOR;
-					CEL(g->prim[1],i,j) = 0;
-					CEL(g->prim[2],i,j) = 0;
-					CEL(g->prim[3],i,j) = PRESS_FLOOR;
+					CEL(g->prim[0],i,j) = bin_rho(r);
+					CEL(g->prim[1],i,j) = -y/r * bin_vel(r);
+					CEL(g->prim[2],i,j) = x/r * bin_vel(r);
+					CEL(g->prim[3],i,j) = bin_press(r);
 				}
 			}
 

@@ -65,8 +65,8 @@ def doit(fnum):
 	gs = gridspec.GridSpec(1, 2)
 
 	ax = fig.add_subplot(gs[0,0])
-	#pl(ax, np.log10(rho), cmap="viridis", vbound=[-9,-3])
-	pl(ax, rho, cmap="viridis", vbound=[0,2.5])
+	pl(ax, np.log10(rho), cmap="viridis", vbound=[-8,2])
+	#pl(ax, rho, cmap="viridis", vbound=[0,2.5])
 
 	ax = fig.add_subplot(gs[0,1])
 	#pl(ax, press * m_air / (rho * kB), cmap="inferno", vbound=None)

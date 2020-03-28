@@ -20,18 +20,11 @@ void eos_prim_floor(double **prim, int nx, int ny)
 			if (CEL(prim[3],i,j) < PRESS_FLOOR) {
 				CEL(prim[3],i,j) = PRESS_FLOOR;
 			}
-
-			if (PRESS_RHO_CEIL > 0) {
-				if (CEL(prim[3],i,j) / CEL(prim[0],i,j) > PRESS_RHO_CEIL) {
-					CEL(prim[3],i,j) = CEL(prim[0],i,j) * PRESS_RHO_CEIL;
-				}
-			}
 		}
 	}
 }
 
-void eos_prim_to_cons(double **prim, double **cons, int nx, int
-		ny)
+void eos_prim_to_cons(double **prim, double **cons, int nx, int ny)
 {
 	int i, j;
 
@@ -55,8 +48,7 @@ void eos_prim_to_cons(double **prim, double **cons, int nx, int
 	}
 }
 
-void eos_cons_to_prim(double **cons, double **prim, int nx, int
-		ny)
+void eos_cons_to_prim(double **cons, double **prim, int nx, int ny)
 {
 	int i, j;
 
