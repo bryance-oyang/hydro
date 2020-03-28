@@ -1,20 +1,26 @@
 #ifndef BINARY_H
 #define BINARY_H
-#if BINARY == 1
 
+#include "def.h"
+#include "grid.h"
 #include <math.h>
 
-#define BIN_OMEGA 1.556166490156496
+#define BIN_ROT_FRAME 0
 #define GM1 1.027373356934356e5
-#define GM2 1.027373356934356e4
-#define BIN_SEP 3.600280088388794e1
-#define BIN_COM 3.272981898535267
+#define GM2 1.027373356934356e2
+#define BIN_SEP 36.00280088388794
+#define BIN_COM (((GM2) / ((GM1) + (GM2))) * (BIN_SEP))
+#define BIN_OMEGA sqrt(((GM1) + (GM2)) / CUBE(BIN_SEP))
+#define BIN_PERIOD ((2*PI) / BIN_OMEGA)
+#define BIN_ANGLE 0
 
-#define M1_CUTOFF 3
+#define M1_CUTOFF 10
+#define M2_CUTOFF 5
+#define BIN_ISOTHERM 1
 #define BIN_TEMP0 4
-#define BIN_DISK_R0 12
-#define BIN_DISK_CUTOFF_WIDTH 3
-#define BIN_DISK_R1 18
+#define BIN_DISK_R0 30
+#define BIN_DISK_CUTOFF_WIDTH 20
+#define BIN_DISK_R1 60
 #define SPEED_LIM 500
 
 static inline double lin_interp(double x0, double x1, double y0, double y1, double x)
@@ -24,7 +30,11 @@ static inline double lin_interp(double x0, double x1, double y0, double y1, doub
 
 static inline double alpha_temp(double r)
 {
-	return BIN_TEMP0 * pow(r, -3.0/4.0);
+	if (BIN_ISOTHERM) {
+		return BIN_TEMP0;
+	} else {
+		return BIN_TEMP0 * pow(r, -3.0/4.0);
+	}
 }
 
 static inline double bin_temp(double r)
@@ -47,7 +57,7 @@ static inline double bin_rho(double r)
 {
 	double rho_disk, rho_bg;
 
-	rho_disk = 1;
+	rho_disk = 2;
 	rho_bg = RHO_FLOOR;
 	if (r >= BIN_DISK_R0 - BIN_DISK_CUTOFF_WIDTH && r < BIN_DISK_R0) {
 		return lin_interp(BIN_DISK_R0 - BIN_DISK_CUTOFF_WIDTH, BIN_DISK_R0, rho_bg, rho_disk, r);
@@ -90,21 +100,27 @@ static inline double bin_vel(double r)
 	double vel2;
 
 	vel2 = fmax(0, GM1/r + r * bin_dpdr(r) / bin_rho(r));
-	return sqrt(vel2) - r * BIN_OMEGA;
+	if (BIN_ROT_FRAME) {
+		return sqrt(vel2) - r * BIN_OMEGA;
+	} else {
+		return sqrt(vel2);
+	}
 }
 
 static inline void binary_boundary(struct grid *g, int step)
 {
 	int i, j;
 	int nx, ny;
-	double dt;
+	double t, dt;
 
 	nx = g->nx;
 	ny = g->ny;
 
 	if (step == 0) {
+		t = g->time;
 		dt = g->dt / 2;
 	} else if (step == 1) {
+		t = g->time + g->dt / 2;
 		dt = g->dt;
 	} else {
 		dt = 0;
@@ -115,13 +131,18 @@ static inline void binary_boundary(struct grid *g, int step)
 #endif /* _OPENMP */
 	for (i = 2; i < nx-2; i++) {
 		for (j = 2; j < ny-2; j++) {
-			double x, y, r;
+			double x, y, r, r2;
 
 			x = CEL(g->x_cc,i,j);
 			y = CEL(g->y_cc,i,j);
 			r = sqrt(SQR(x) + SQR(y));
+			if (BIN_ROT_FRAME) {
+				r2 = sqrt(SQR(x - BIN_SEP*cos(BIN_ANGLE)) + SQR(y - BIN_SEP*sin(BIN_ANGLE)));
+			} else {
+				r2 = sqrt(SQR(x - BIN_SEP*cos(BIN_OMEGA*t + BIN_ANGLE)) + SQR(y - BIN_SEP*sin(BIN_OMEGA*t + BIN_ANGLE)));
+			}
 
-			if (r <= M1_CUTOFF) {
+			if (r <= M1_CUTOFF || r2 <= M2_CUTOFF) {
 				CEL(g->prim[0],i,j) = RHO_FLOOR;
 				CEL(g->prim[1],i,j) = 0;
 				CEL(g->prim[2],i,j) = 0;
@@ -135,20 +156,22 @@ static inline void binary_boundary(struct grid *g, int step)
 		}
 	}
 
+	if (BIN_ROT_FRAME) {
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
-	for (i = 2; i < nx-2; i++) {
-		for (j = 2; j < ny-2; j++) {
-			double vx, vy, dtomega;
+		for (i = 2; i < nx-2; i++) {
+			for (j = 2; j < ny-2; j++) {
+				double vx, vy, dtomega;
 
-			dtomega = dt * BIN_OMEGA;
-			vx = CEL(g->prim[1],i,j);
-			vy = CEL(g->prim[2],i,j);
-			CEL(g->prim[1],i,j) = ((1 - SQR(dtomega))*vx + 2*dtomega*vy)
-				/ (1 + SQR(dtomega));
-			CEL(g->prim[2],i,j) = (-2*dtomega*vx + (1 - SQR(dtomega))*vy)
-				/ (1 + SQR(dtomega));
+				dtomega = dt * BIN_OMEGA;
+				vx = CEL(g->prim[1],i,j);
+				vy = CEL(g->prim[2],i,j);
+				CEL(g->prim[1],i,j) = ((1 - SQR(dtomega))*vx + 2*dtomega*vy)
+					/ (1 + SQR(dtomega));
+				CEL(g->prim[2],i,j) = (-2*dtomega*vx + (1 - SQR(dtomega))*vy)
+					/ (1 + SQR(dtomega));
+			}
 		}
 	}
 
@@ -170,5 +193,4 @@ static inline void binary_boundary(struct grid *g, int step)
 	}
 }
 
-#endif /* BINARY == 1 */
 #endif /* BINARY_H */

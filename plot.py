@@ -39,12 +39,17 @@ def doit(fnum):
 	print("fnum = %d" % fnum)
 	try:
 		rho = np.transpose(np.loadtxt("data/rho_%05d.dat" % fnum))
+		vx = np.transpose(np.loadtxt("data/vx_%05d.dat" % fnum))
+		vy = np.transpose(np.loadtxt("data/vy_%05d.dat" % fnum))
 		press = np.transpose(np.loadtxt("data/press_%05d.dat" % fnum))
+		v = np.sqrt(vx**2 + vy**2)
 	except:
 		return
 
 	x = np.linspace(xmin, xmax, nx+1)
+	xcc = (x[:-1] + x[1:]) / 2
 	y = np.linspace(ymin, ymax, ny+1)
+	ycc = (y[:-1] + y[1:]) / 2
 	[x, y] = np.meshgrid(x, y, indexing="xy")
 
 	def pl(ax, q, cmap="viridis", vbound=None):
@@ -65,8 +70,9 @@ def doit(fnum):
 	gs = gridspec.GridSpec(1, 2)
 
 	ax = fig.add_subplot(gs[0,0])
-	pl(ax, np.log10(rho), cmap="viridis", vbound=[-8,2])
-	#pl(ax, rho, cmap="viridis", vbound=[0,2.5])
+	#pl(ax, np.log10(rho), cmap="viridis", vbound=[-8,2])
+	pl(ax, rho, cmap="viridis", vbound=[-1,2.5])
+	ax.streamplot(xcc, ycc, vx, vy, color=v, cmap="gray", density=2)
 
 	ax = fig.add_subplot(gs[0,1])
 	#pl(ax, press * m_air / (rho * kB), cmap="inferno", vbound=None)

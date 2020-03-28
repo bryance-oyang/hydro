@@ -1,4 +1,5 @@
 #include "def.h"
+#include "binary.h"
 
 double XMIN;
 double XMAX;
@@ -24,11 +25,11 @@ void global_const()
 	GRAV = 0;
 
 #if BINARY == 1
-	XMIN = -27;
-	XMAX = 27;
-	YMIN = -27;
-	YMAX = 27;
-	OUT_TF = 6;
+	XMIN = -100;
+	XMAX = 100;
+	YMIN = -100;
+	YMAX = 100;
+	OUT_TF = 1*BIN_PERIOD;
 	GAMMA = 5.0/3.0;
 	GRAV = 0;
 #endif

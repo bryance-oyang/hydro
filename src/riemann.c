@@ -34,7 +34,7 @@ static inline double slope_lim(double r)
 	}
 }
 
-void reconstruct(struct grid *g, int dir)
+void reconstruct(struct grid *g, int step, int dir)
 {
 	int i, j, nx, ny;
 	int m, n;
@@ -57,24 +57,29 @@ void reconstruct(struct grid *g, int dir)
 #endif /* _OPENMP */
 		for (i = 1; i < nx-1; i++) {
 			for (j = 1; j < ny-1; j++) {
-				double q0, q1, q2;
-				double half_step, Lq, Uq;
+				double q1;
 
-				q0 = CEL(g->prim[n],i-di,j-dj);
 				q1 = CEL(g->prim[n],i,j);
-				q2 = CEL(g->prim[n],i+di,j+dj);
 
-				if ((q2 - q1) == 0) {
-					half_step = 0;
+				if (RECONSTRUCT && step == 1) {
+					double q0, q2;
+					double half_step;
+
+					q0 = CEL(g->prim[n],i-di,j-dj);
+					q2 = CEL(g->prim[n],i+di,j+dj);
+
+					if ((q2 - q1) == 0) {
+						half_step = 0;
+					} else {
+						half_step = 0.5 * slope_lim((q1 - q0) / (q2 - q1)) * (q2 - q1);
+					}
+
+					FEL(g->Uprim[n],i,j) = q1 - half_step;
+					FEL(g->Lprim[n],i+di,j+dj) = q1 + half_step;
 				} else {
-					half_step = 0.5 * slope_lim((q1 - q0) / (q2 - q1)) * (q2 - q1);
+					FEL(g->Uprim[n],i,j) = q1;
+					FEL(g->Lprim[n],i+di,j+dj) = q1;
 				}
-
-				Lq = q1 + half_step;
-				Uq = q1 - half_step;
-
-				FEL(g->Uprim[n],i,j) = Uq;
-				FEL(g->Lprim[n],i+di,j+dj) = Lq;
 			}
 		}
 	}
@@ -85,24 +90,29 @@ void reconstruct(struct grid *g, int dir)
 #endif /* _OPENMP */
 		for (i = 1; i < nx-1; i++) {
 			for (j = 1; j < ny-1; j++) {
-				double q0, q1, q2;
-				double half_step, Lq, Uq;
+				double q1;
 
-				q0 = CEL(g->s[m],i-di,j-dj);
 				q1 = CEL(g->s[m],i,j);
-				q2 = CEL(g->s[m],i+di,j+dj);
 
-				if ((q2 - q1) == 0) {
-					half_step = 0;
+				if (RECONSTRUCT && step == 1) {
+					double q0, q2;
+					double half_step;
+
+					q0 = CEL(g->s[m],i-di,j-dj);
+					q2 = CEL(g->s[m],i+di,j+dj);
+
+					if ((q2 - q1) == 0) {
+						half_step = 0;
+					} else {
+						half_step = 0.5 * slope_lim((q1 - q0) / (q2 - q1)) * (q2 - q1);
+					}
+
+					FEL(g->Us[m],i,j) = q1 - half_step;
+					FEL(g->Ls[m],i+di,j+dj) = q1 + half_step;
 				} else {
-					half_step = 0.5 * slope_lim((q1 - q0) / (q2 - q1)) * (q2 - q1);
+					FEL(g->Us[m],i,j) = q1;
+					FEL(g->Ls[m],i+di,j+dj) = q1;
 				}
-
-				Lq = q1 + half_step;
-				Uq = q1 - half_step;
-
-				FEL(g->Us[m],i,j) = Uq;
-				FEL(g->Ls[m],i+di,j+dj) = Lq;
 			}
 		}
 	}

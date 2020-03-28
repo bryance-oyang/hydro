@@ -8,8 +8,8 @@
 #define NTHREAD 4
 #define THREAD_SCHEDULE static
 
-#define NX 128
-#define NY 128
+#define NX 100
+#define NY 100
 
 #define BINARY 1
 #define KH_INSTAB 0
@@ -32,7 +32,10 @@
 
 #define PI 3.1415926535897932384626433
 #define kB 1.380649e-16
+
 #define SQR(x) ((x)*(x))
+#define CUBE(x) ((x)*(x)*(x))
+#define QUAD(x) ((x)*(x)*(x)*(x))
 
 #define CEL(a,i,j) ((a)[(i)*ny + (j)])
 #define FEL(a,i,j) ((a)[(i)*(ny+1) + (j)])

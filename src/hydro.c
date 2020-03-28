@@ -40,19 +40,30 @@ void boundary(struct grid *g, int step)
 	}
 }
 
-static double potential(double x, double y)
+static double potential(double t, double x, double y)
 {
 	if (BINARY) {
-		double r, grav1, grav2, spin;
+		double r, grav1, grav2, spin, r2;
 
 		r = sqrt(SQR(x) + SQR(y));
 		if (r <= M1_CUTOFF) {
 			grav1 = -GM1 / M1_CUTOFF;
 		} else {
-			grav1 = -GM1 / sqrt(SQR(x) + SQR(y));
+			grav1 = -GM1 / r;
 		}
-		grav2 = -GM2 / sqrt(SQR(x - BIN_SEP) + SQR(y));
-		spin = -0.5 * (SQR(x - BIN_COM) + SQR(y)) * SQR(BIN_OMEGA);
+		if (BIN_ROT_FRAME) {
+			r2 = sqrt(SQR(x - BIN_SEP*cos(BIN_ANGLE)) + SQR(y - BIN_SEP*sin(BIN_ANGLE)));
+			spin = -0.5 * (SQR(x - BIN_COM*cos(BIN_ANGLE)) + SQR(y - BIN_COM*sin(BIN_ANGLE))) * SQR(BIN_OMEGA);
+		} else {
+			r2 = sqrt(SQR(x - BIN_SEP*cos(BIN_OMEGA*t + BIN_ANGLE)) + SQR(y - BIN_SEP*sin(BIN_OMEGA*t + BIN_ANGLE)));
+			spin = 0;
+		}
+		if (r2 <= M2_CUTOFF) {
+			grav2 = -GM2 / M2_CUTOFF;
+		} else {
+			grav2 = -GM2 / r2;
+
+		}
 		return grav1 + grav2 + spin;
 	} else {
 		return GRAV * y;
@@ -64,7 +75,9 @@ static void compute_src(struct grid *g, int step)
 	int i, j, nx, ny;
 	int m;
 	double dx, dy;
+	double t;
 
+	t = g->time + step * g->dt / 2;
 	nx = g->nx;
 	ny = g->ny;
 	dx = g->dx;
@@ -88,19 +101,19 @@ static void compute_src(struct grid *g, int step)
 			div_rhov = (FEL(g->Jx[0],i+1,j) - FEL(g->Jx[0],i,j)) / dx
 				+ (FEL(g->Jy[0],i,j+1) - FEL(g->Jy[0],i,j)) / dy;
 
-			div_rhovpot = (potential(Ux, y) * FEL(g->Jx[0],i+1,j) - potential(Lx, y) * FEL(g->Jx[0],i,j)) / dx
-				+ (potential(x, Uy) * FEL(g->Jy[0],i,j+1) - potential(x, Ly) * FEL(g->Jy[0],i,j)) / dy;
+			div_rhovpot = (potential(t, Ux, y) * FEL(g->Jx[0],i+1,j) - potential(t, Lx, y) * FEL(g->Jx[0],i,j)) / dx
+				+ (potential(t, x, Uy) * FEL(g->Jy[0],i,j+1) - potential(t, x, Ly) * FEL(g->Jy[0],i,j)) / dy;
 
-			pot_cc = potential(x, y);
+			pot_cc = potential(t, x, y);
 
 			CEL(g->src[0],i,j) = 0;
-			CEL(g->src[1],i,j) = CEL(g->prim[0],i,j) * (potential(Lx, y) - potential(Ux, y)) / dx;
-			CEL(g->src[2],i,j) = CEL(g->prim[0],i,j) * (potential(x, Ly) - potential(x, Uy)) / dy;
+			CEL(g->src[1],i,j) = CEL(g->prim[0],i,j) * (potential(t, Lx, y) - potential(t, Ux, y)) / dx;
+			CEL(g->src[2],i,j) = CEL(g->prim[0],i,j) * (potential(t, x, Ly) - potential(t, x, Uy)) / dy;
 			if (FANCY_POT_NRG) {
 				CEL(g->src[3],i,j) = pot_cc * div_rhov - div_rhovpot;
 			} else {
-				CEL(g->src[3],i,j) = CEL(g->cons[1],i,j) * (potential(Lx, y) - potential(Ux, y)) / dx
-					+ CEL(g->cons[2],i,j) * (potential(x, Ly) - potential(x, Uy)) / dy;
+				CEL(g->src[3],i,j) = CEL(g->cons[1],i,j) * (potential(t, Lx, y) - potential(t, Ux, y)) / dx
+					+ CEL(g->cons[2],i,j) * (potential(t, x, Ly) - potential(t, x, Uy)) / dy;
 			}
 
 			if (step == 0) {
@@ -224,26 +237,25 @@ static void add_flux_div_src(struct grid *g, int step)
 	}
 }
 
+static void compute_J(struct grid *g, int step, int dir)
+{
+	reconstruct(g, step, dir);
+	wavespeed(g, step, dir);
+	if (HLLC) {
+		hllc(g, dir);
+	} else {
+		hlle(g, dir);
+	}
+}
+
 static void compute_Jx(struct grid *g, int step)
 {
-	reconstruct(g, 0);
-	wavespeed(g, step, 0);
-	if (HLLC) {
-		hllc(g, 0);
-	} else {
-		hlle(g, 0);
-	}
+	compute_J(g, step, 0);
 }
 
 static void compute_Jy(struct grid *g, int step)
 {
-	reconstruct(g, 1);
-	wavespeed(g, step, 1);
-	if (HLLC) {
-		hllc(g, 1);
-	} else {
-		hlle(g, 1);
-	}
+	compute_J(g, step, 1);
 }
 
 void advance_timestep(struct grid *g)

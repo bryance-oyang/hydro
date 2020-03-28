@@ -65,6 +65,12 @@ void output(struct grid *g, int nout)
 	sprintf(filename, "data/rho_%05d.dat", nout);
 	output_array(filename, g->prim[0], g->nx, g->ny);
 
+	sprintf(filename, "data/vx_%05d.dat", nout);
+	output_array(filename, g->prim[1], g->nx, g->ny);
+
+	sprintf(filename, "data/vy_%05d.dat", nout);
+	output_array(filename, g->prim[2], g->nx, g->ny);
+
 	sprintf(filename, "data/press_%05d.dat", nout);
 	output_array(filename, g->prim[3], g->nx, g->ny);
 }
