@@ -71,7 +71,7 @@ def doit(fnum):
 
 	ax = fig.add_subplot(gs[0,0])
 	#pl(ax, np.log10(rho), cmap="inferno", vbound=[-8,1])
-	pl(ax, rho, cmap="PuRd", vbound=[0,1.25])
+	pl(ax, rho, cmap="YlOrRd", vbound=[0,1.25])
 	#ax.streamplot(xcc, ycc, vx, vy, color=v, cmap="gray", density=2)
 	#res_circle = plt.Circle((0, 0), 1.2e10, color="w", fill=False, linewidth=0.5)
 	#ax.add_artist(res_circle)

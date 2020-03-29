@@ -2,7 +2,7 @@
 #define DEF_H
 
 #define HLLC 1
-#define RECONSTRUCT 1
+#define RECONSTRUCT 3
 #define FANCY_POT_NRG 1
 #define ROE_WAVESPEED 1
 #define NTHREAD 4
@@ -41,6 +41,10 @@
 
 #define CEL(a,i,j) ((a)[(i)*ny + (j)])
 #define FEL(a,i,j) ((a)[(i)*(ny+1) + (j)])
+
+#if RECONSTRUCT != 1 && RECONSTRUCT != 2 && RECONSTRUCT != 3
+#error "RECONSTRUCT must be in {1,2,3}"
+#endif
 
 void global_const();
 

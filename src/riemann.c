@@ -34,6 +34,15 @@ static inline double slope_lim(double r)
 	}
 }
 
+static inline double reconstruct_dq(double Lq, double Mq, double Uq)
+{
+	if ((Uq - Mq) == 0) {
+		return 0;
+	} else {
+		return slope_lim((Mq - Lq) / (Uq - Mq)) * (Uq - Mq);
+	}
+}
+
 void reconstruct(struct grid *g, int step, int dir)
 {
 	int i, j, nx, ny;
@@ -57,29 +66,52 @@ void reconstruct(struct grid *g, int step, int dir)
 #endif /* _OPENMP */
 		for (i = 2; i < nx-2; i++) {
 			for (j = 2; j < ny-2; j++) {
-				double q1;
+				double q0, q1, q2, q3, q4;
+				double ql, qr;
 
-				q1 = CEL(g->prim[n],i,j);
+				q0 = CEL(g->prim[n],i-2*di,j-2*dj);
+				q1 = CEL(g->prim[n],i-di,j-dj);
+				q2 = CEL(g->prim[n],i,j);
+				q3 = CEL(g->prim[n],i+di,j+dj);
+				q4 = CEL(g->prim[n],i+2*di,j+2*dj);
 
-				if (RECONSTRUCT && step == 1) {
-					double q0, q2;
-					double half_step;
+				if (RECONSTRUCT == 3 && step == 1) {
+					double dq1, dq2, dq3;
 
-					q0 = CEL(g->prim[n],i-di,j-dj);
-					q2 = CEL(g->prim[n],i+di,j+dj);
+					dq1 = reconstruct_dq(q0, q1, q2);
+					dq2 = reconstruct_dq(q1, q2, q3);
+					dq3 = reconstruct_dq(q2, q3, q4);
 
-					if ((q2 - q1) == 0) {
-						half_step = 0;
-					} else {
-						half_step = 0.5 * slope_lim((q1 - q0) / (q2 - q1)) * (q2 - q1);
+					ql = 0.5*(q1 + q2) - (dq2 - dq1) / 6;
+					qr = 0.5*(q2 + q3) - (dq3 - dq2) / 6;
+
+					double test1, test2;
+					test1 = 6*(qr - ql) * (q2 - 0.5*(ql + qr));
+					test2 = SQR(qr - ql);
+
+					if ((qr - q2) * (q2 - ql) <= 0) {
+						ql = q2;
+						qr = q2;
+					} else if (test1 > test2) {
+						ql = 3*q2 - 2*qr;
+					} else if (-test2 > test1) {
+						qr = 3*q2 - 2*ql;
 					}
 
-					FEL(g->Uprim[n],i,j) = q1 - half_step;
-					FEL(g->Lprim[n],i+di,j+dj) = q1 + half_step;
+				} else if (RECONSTRUCT == 2 && step == 1) {
+					double half_step;
+
+					half_step = 0.5 * reconstruct_dq(q1, q2, q3);
+
+					ql = q2 - half_step;
+					qr = q2 + half_step;
 				} else {
-					FEL(g->Uprim[n],i,j) = q1;
-					FEL(g->Lprim[n],i+di,j+dj) = q1;
+					ql = q2;
+					qr = q2;
 				}
+
+				FEL(g->Uprim[n],i,j) = ql;
+				FEL(g->Lprim[n],i+di,j+dj) = qr;
 			}
 		}
 	}
@@ -90,29 +122,52 @@ void reconstruct(struct grid *g, int step, int dir)
 #endif /* _OPENMP */
 		for (i = 2; i < nx-2; i++) {
 			for (j = 2; j < ny-2; j++) {
-				double q1;
+				double q0, q1, q2, q3, q4;
+				double ql, qr;
 
-				q1 = CEL(g->s[m],i,j);
+				q0 = CEL(g->s[m],i-2*di,j-2*dj);
+				q1 = CEL(g->s[m],i-di,j-dj);
+				q2 = CEL(g->s[m],i,j);
+				q3 = CEL(g->s[m],i+di,j+dj);
+				q4 = CEL(g->s[m],i+2*di,j+2*dj);
 
-				if (RECONSTRUCT && step == 1) {
-					double q0, q2;
-					double half_step;
+				if (RECONSTRUCT == 3 && step == 1) {
+					double dq1, dq2, dq3;
 
-					q0 = CEL(g->s[m],i-di,j-dj);
-					q2 = CEL(g->s[m],i+di,j+dj);
+					dq1 = reconstruct_dq(q0, q1, q2);
+					dq2 = reconstruct_dq(q1, q2, q3);
+					dq3 = reconstruct_dq(q2, q3, q4);
 
-					if ((q2 - q1) == 0) {
-						half_step = 0;
-					} else {
-						half_step = 0.5 * slope_lim((q1 - q0) / (q2 - q1)) * (q2 - q1);
+					ql = 0.5*(q1 + q2) - (dq2 - dq1) / 6;
+					qr = 0.5*(q2 + q3) - (dq3 - dq2) / 6;
+
+					double test1, test2;
+					test1 = 6*(qr - ql) * (q2 - 0.5*(ql + qr));
+					test2 = SQR(qr - ql);
+
+					if ((qr - q2) * (q2 - ql) <= 0) {
+						ql = q2;
+						qr = q2;
+					} else if (test1 > test2) {
+						ql = 3*q2 - 2*qr;
+					} else if (-test2 > test1) {
+						qr = 3*q2 - 2*ql;
 					}
 
-					FEL(g->Us[m],i,j) = q1 - half_step;
-					FEL(g->Ls[m],i+di,j+dj) = q1 + half_step;
+				} else if (RECONSTRUCT == 2 && step == 1) {
+					double half_step;
+
+					half_step = 0.5 * reconstruct_dq(q1, q2, q3);
+
+					ql = q2 - half_step;
+					qr = q2 + half_step;
 				} else {
-					FEL(g->Us[m],i,j) = q1;
-					FEL(g->Ls[m],i+di,j+dj) = q1;
+					ql = q2;
+					qr = q2;
 				}
+
+				FEL(g->Us[m],i,j) = ql;
+				FEL(g->Ls[m],i+di,j+dj) = qr;
 			}
 		}
 	}

@@ -170,8 +170,7 @@ static inline void binary_boundary(struct grid *g, int step)
 				r2 = sqrt(SQR(x - BIN_SEP*cos(BIN_OMEGA*t + BIN_ANGLE)) + SQR(y - BIN_SEP*sin(BIN_OMEGA*t + BIN_ANGLE)));
 			}
 
-			//if (r <= M1_CUTOFF || r2 <= M2_CUTOFF) {
-			if (r <= M1_CUTOFF) {
+			if (r <= M1_CUTOFF || r2 <= M2_CUTOFF) {
 				CEL(g->prim[0],i,j) = RHO_FLOOR;
 				CEL(g->prim[1],i,j) = 0;
 				CEL(g->prim[2],i,j) = 0;
