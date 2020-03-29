@@ -21,17 +21,17 @@ void init_grid(struct grid *g)
 	dx = g->dx;
 	dy = g->dy;
 
-	for (i = 2; i < nx-1; i++) {
-		for (j = 2; j < ny-1; j++) {
-			CEL(g->x_cc,i,j) = XMIN + (i-1.5)*dx;
-			CEL(g->y_cc,i,j) = YMIN + (j-1.5)*dy;
-			FEL(g->x_fc,i,j) = XMIN + (i-2)*dx;
-			FEL(g->y_fc,i,j) = YMIN + (j-2)*dy;
+	for (i = 3; i < nx-2; i++) {
+		for (j = 3; j < ny-2; j++) {
+			CEL(g->x_cc,i,j) = XMIN + (i-2.5)*dx;
+			CEL(g->y_cc,i,j) = YMIN + (j-2.5)*dy;
+			FEL(g->x_fc,i,j) = XMIN + (i-3)*dx;
+			FEL(g->y_fc,i,j) = YMIN + (j-3)*dy;
 		}
 	}
 
-	for (i = 0; i < nx; i++) {
-		for (j = 0; j < ny; j++) {
+	for (i = 3; i < nx-3; i++) {
+		for (j = 3; j < ny-3; j++) {
 			x = CEL(g->x_cc,i,j);
 			y = CEL(g->y_cc,i,j);
 
@@ -113,6 +113,20 @@ void init_grid(struct grid *g)
 					CEL(g->prim[1],i,j) = 0;
 					CEL(g->prim[2],i,j) = 0;
 					CEL(g->prim[3],i,j) = 0.1;
+				}
+			}
+
+			if (IMPLOSION) {
+				if (x + y > 0.15) {
+					CEL(g->prim[0],i,j) = 1;
+					CEL(g->prim[1],i,j) = 0;
+					CEL(g->prim[2],i,j) = 0;
+					CEL(g->prim[3],i,j) = 1;
+				} else {
+					CEL(g->prim[0],i,j) = 0.125;
+					CEL(g->prim[1],i,j) = 0;
+					CEL(g->prim[2],i,j) = 0;
+					CEL(g->prim[3],i,j) = 0.14;
 				}
 			}
 

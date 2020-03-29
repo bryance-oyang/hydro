@@ -27,8 +27,8 @@ void output_array(char *filename, double *q, int nx, int ny)
 		exit(EXIT_FAILURE);
 	}
 
-	for (i = 2; i < nx-2; i++) {
-		for (j = 2; j < ny-2; j++) {
+	for (i = 3; i < nx-3; i++) {
+		for (j = 3; j < ny-3; j++) {
 			fprintf(f, "%g ", CEL(q,i,j));
 		}
 		fprintf(f, "\n");
@@ -87,14 +87,14 @@ int main()
 
 	global_const();
 
-	g = alloc_grid(NX+4, NY+4, DX, DY);
+	g = alloc_grid(NX+6, NY+6, DX, DY);
 	init_grid(g);
 	boundary(g, -1);
 
 	nout = 0;
 	out_time = 0;
 	for (epoch = 0; epoch < MAX_EPOCH; epoch++) {
-		printf("t = %g | dt = %g\n", g->time, g->dt);
+		printf("t = %.3e\tdt = %.3e\t%.2f%%\n", g->time, g->dt, 100*g->time/OUT_TF);
 		if (g->time >= out_time) {
 			output(g, nout);
 			out_time = g->time + OUT_DT;

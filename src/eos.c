@@ -79,8 +79,8 @@ void eos_sound_speed(struct grid *g)
 	nx = g->nx;
 	ny = g->ny;
 
-	for (i = 1; i < nx-1; i++) {
-		for (j = 1; j < ny-1; j++) {
+	for (i = 2; i < nx-2; i++) {
+		for (j = 2; j < ny-2; j++) {
 			double rho, press;
 
 			rho = CEL(g->prim[0],i,j);

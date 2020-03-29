@@ -70,13 +70,15 @@ def doit(fnum):
 	gs = gridspec.GridSpec(1, 2)
 
 	ax = fig.add_subplot(gs[0,0])
-	#pl(ax, np.log10(rho), cmap="viridis", vbound=[-8,2])
-	pl(ax, rho, cmap="viridis", vbound=[-1,2.5])
-	ax.streamplot(xcc, ycc, vx, vy, color=v, cmap="gray", density=2)
+	#pl(ax, np.log10(rho), cmap="inferno", vbound=[-8,1])
+	pl(ax, rho, cmap="PuRd", vbound=[0,1.25])
+	#ax.streamplot(xcc, ycc, vx, vy, color=v, cmap="gray", density=2)
+	#res_circle = plt.Circle((0, 0), 1.2e10, color="w", fill=False, linewidth=0.5)
+	#ax.add_artist(res_circle)
 
 	ax = fig.add_subplot(gs[0,1])
 	#pl(ax, press * m_air / (rho * kB), cmap="inferno", vbound=None)
-	pl(ax, press / rho, cmap="inferno", vbound=None)
+	pl(ax, press / rho, cmap="inferno", vbound=[0,1.5])
 	#pl(ax, press, cmap="inferno", vbound=None)
 
 	gs.tight_layout(fig)

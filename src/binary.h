@@ -5,23 +5,51 @@
 #include "grid.h"
 #include <math.h>
 
+#define SATURN 1
+#define AMCVN 0
+
+#if SATURN == 1
+#define GM1 (BIG_G * 5.683e29)
+//#define GM2 (BIG_G * 3.7493e22)
+#define GM2 (BIG_G * 3.7493e25)
+#define BIN_SEP 1.85539e10
+#define RGAS (kB / 5.01786569e-23)
+
 #define BIN_ROT_FRAME 0
+//#define M1_CUTOFF 5.8232e9
+#define M1_CUTOFF 1e9
+#define M2_CUTOFF 5e8
+#define BIN_DISK_R0 7e9
+#define BIN_DISK_CUTOFF_WIDTH 1e9
+#define BIN_DISK_R1 1.5e10
+#define BIN_RHO0 2
+#define BIN_ISOTHERM 1
+#define BIN_TEMP0 300
+#define SPEED_LIM sqrt(2 * GM1 / M1_CUTOFF)
+#endif
+
+#if AMCVN == 1
 #define GM1 1.027373356934356e5
 #define GM2 1.027373356934356e2
 #define BIN_SEP 36.00280088388794
+#define RGAS 1
+
+#define BIN_ROT_FRAME 0
+#define M1_CUTOFF 10
+#define M2_CUTOFF 5
+#define BIN_DISK_R0 30
+#define BIN_DISK_CUTOFF_WIDTH 20
+#define BIN_DISK_R1 60
+#define BIN_RHO0 2
+#define BIN_ISOTHERM 1
+#define BIN_TEMP0 4
+#define SPEED_LIM 500
+#endif
+
 #define BIN_COM (((GM2) / ((GM1) + (GM2))) * (BIN_SEP))
 #define BIN_OMEGA sqrt(((GM1) + (GM2)) / CUBE(BIN_SEP))
 #define BIN_PERIOD ((2*PI) / BIN_OMEGA)
 #define BIN_ANGLE 0
-
-#define M1_CUTOFF 10
-#define M2_CUTOFF 5
-#define BIN_ISOTHERM 1
-#define BIN_TEMP0 4
-#define BIN_DISK_R0 30
-#define BIN_DISK_CUTOFF_WIDTH 20
-#define BIN_DISK_R1 60
-#define SPEED_LIM 500
 
 static inline double lin_interp(double x0, double x1, double y0, double y1, double x)
 {
@@ -57,7 +85,7 @@ static inline double bin_rho(double r)
 {
 	double rho_disk, rho_bg;
 
-	rho_disk = 2;
+	rho_disk = BIN_RHO0;
 	rho_bg = RHO_FLOOR;
 	if (r >= BIN_DISK_R0 - BIN_DISK_CUTOFF_WIDTH && r < BIN_DISK_R0) {
 		return lin_interp(BIN_DISK_R0 - BIN_DISK_CUTOFF_WIDTH, BIN_DISK_R0, rho_bg, rho_disk, r);
@@ -72,7 +100,7 @@ static inline double bin_rho(double r)
 
 static inline double bin_press(double r)
 {
-	return bin_rho(r) * bin_temp(r);
+	return RGAS * bin_rho(r) * alpha_temp(r);
 	/*
 	double press_disk, press_bg;
 
@@ -129,8 +157,8 @@ static inline void binary_boundary(struct grid *g, int step)
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
-	for (i = 2; i < nx-2; i++) {
-		for (j = 2; j < ny-2; j++) {
+	for (i = 3; i < nx-3; i++) {
+		for (j = 3; j < ny-3; j++) {
 			double x, y, r, r2;
 
 			x = CEL(g->x_cc,i,j);
@@ -142,7 +170,8 @@ static inline void binary_boundary(struct grid *g, int step)
 				r2 = sqrt(SQR(x - BIN_SEP*cos(BIN_OMEGA*t + BIN_ANGLE)) + SQR(y - BIN_SEP*sin(BIN_OMEGA*t + BIN_ANGLE)));
 			}
 
-			if (r <= M1_CUTOFF || r2 <= M2_CUTOFF) {
+			//if (r <= M1_CUTOFF || r2 <= M2_CUTOFF) {
+			if (r <= M1_CUTOFF) {
 				CEL(g->prim[0],i,j) = RHO_FLOOR;
 				CEL(g->prim[1],i,j) = 0;
 				CEL(g->prim[2],i,j) = 0;
@@ -151,7 +180,7 @@ static inline void binary_boundary(struct grid *g, int step)
 				double rho;
 
 				rho = CEL(g->prim[0],i,j);
-				CEL(g->prim[3],i,j) = rho * alpha_temp(r);
+				CEL(g->prim[3],i,j) = RGAS * rho * alpha_temp(r);
 			}
 		}
 	}
@@ -160,8 +189,8 @@ static inline void binary_boundary(struct grid *g, int step)
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
-		for (i = 2; i < nx-2; i++) {
-			for (j = 2; j < ny-2; j++) {
+		for (i = 3; i < nx-3; i++) {
+			for (j = 3; j < ny-3; j++) {
 				double vx, vy, dtomega;
 
 				dtomega = dt * BIN_OMEGA;
@@ -178,16 +207,18 @@ static inline void binary_boundary(struct grid *g, int step)
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
-	for (i = 2; i < nx-2; i++) {
-		for (j = 2; j < ny-2; j++) {
+	for (i = 3; i < nx-3; i++) {
+		for (j = 3; j < ny-3; j++) {
 			double vx, vy, v;
 
 			vx = CEL(g->prim[1],i,j);
 			vy = CEL(g->prim[2],i,j);
 			v = sqrt(SQR(vx) + SQR(vy));
-			if (v > SPEED_LIM) {
-				CEL(g->prim[1],i,j) *= SPEED_LIM / v;
-				CEL(g->prim[2],i,j) *= SPEED_LIM / v;
+			if (SPEED_LIM > 0) {
+				if (v > SPEED_LIM) {
+					CEL(g->prim[1],i,j) *= SPEED_LIM / v;
+					CEL(g->prim[2],i,j) *= SPEED_LIM / v;
+				}
 			}
 		}
 	}

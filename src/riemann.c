@@ -55,8 +55,8 @@ void reconstruct(struct grid *g, int step, int dir)
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
-		for (i = 1; i < nx-1; i++) {
-			for (j = 1; j < ny-1; j++) {
+		for (i = 2; i < nx-2; i++) {
+			for (j = 2; j < ny-2; j++) {
 				double q1;
 
 				q1 = CEL(g->prim[n],i,j);
@@ -88,8 +88,8 @@ void reconstruct(struct grid *g, int step, int dir)
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
-		for (i = 1; i < nx-1; i++) {
-			for (j = 1; j < ny-1; j++) {
+		for (i = 2; i < nx-2; i++) {
+			for (j = 2; j < ny-2; j++) {
 				double q1;
 
 				q1 = CEL(g->s[m],i,j);
@@ -143,8 +143,8 @@ void wavespeed(struct grid *g, int step, int dir)
 		dj = 1;
 	}
 
-	for (i = 2; i < nx-1; i++) {
-		for (j = 2; j < ny-1; j++) {
+	for (i = 3; i < nx-2; i++) {
+		for (j = 3; j < ny-2; j++) {
 			double sqrt_Lrho, sqrt_Urho, Lmom, Umom, Lv, Uv;
 			double Lcs, Ucs, cs;
 			double avg_vel;
@@ -213,8 +213,8 @@ void hlle(struct grid *g, int dir)
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
-		for (i = 2; i < nx-1; i++) {
-			for (j = 2; j < ny-1; j++) {
+		for (i = 3; i < nx-2; i++) {
+			for (j = 3; j < ny-2; j++) {
 				double Lw, Uw;
 				double Lv, Uv;
 				double Lpress, Upress;
@@ -262,8 +262,8 @@ void hlle(struct grid *g, int dir)
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
-		for (i = 2; i < nx-1; i++) {
-			for (j = 2; j < ny-1; j++) {
+		for (i = 3; i < nx-2; i++) {
+			for (j = 3; j < ny-2; j++) {
 				double Lw, Uw;
 				double Lv, Uv;
 
@@ -314,8 +314,8 @@ void hllc(struct grid *g, int dir)
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
-	for (i = 2; i < nx-1; i++) {
-		for (j = 2; j < ny-1; j++) {
+	for (i = 3; i < nx-2; i++) {
+		for (j = 3; j < ny-2; j++) {
 			int m, n;
 			double Lw, Uw, Mw;
 			double Lv, Uv;

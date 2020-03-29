@@ -86,8 +86,8 @@ static void compute_src(struct grid *g, int step)
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
-	for (i = 2; i < nx-2; i++) {
-		for (j = 2; j < ny-2; j++) {
+	for (i = 3; i < nx-3; i++) {
+		for (j = 3; j < ny-3; j++) {
 			double Lx, Ux, Ly, Uy, x, y;
 			double div_rhov, div_rhovpot, pot_cc;
 
@@ -149,8 +149,8 @@ static void compute_src(struct grid *g, int step)
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
-		for (i = 2; i < nx-2; i++) {
-			for (j = 2; j < ny-2; j++) {
+		for (i = 3; i < nx-3; i++) {
+			for (j = 3; j < ny-3; j++) {
 				CEL(g->s_src[m],i,j) = 0;
 			}
 		}
@@ -169,8 +169,8 @@ static void copy_gen(struct grid *g)
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
-		for (i = 2; i < nx-2; i++) {
-			for (j = 2; j < ny-2; j++) {
+		for (i = 3; i < nx-3; i++) {
+			for (j = 3; j < ny-3; j++) {
 				CEL(g->prim_gen[n],i,j) = CEL(g->prim[n],i,j);
 				CEL(g->cons_gen[n],i,j) = CEL(g->cons[n],i,j);
 			}
@@ -181,8 +181,8 @@ static void copy_gen(struct grid *g)
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
-		for (i = 2; i < nx-2; i++) {
-			for (j = 2; j < ny-2; j++) {
+		for (i = 3; i < nx-3; i++) {
+			for (j = 3; j < ny-3; j++) {
 				CEL(g->s_gen[m],i,j) = CEL(g->s[m],i,j);
 			}
 		}
@@ -212,8 +212,8 @@ static void add_flux_div_src(struct grid *g, int step)
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
-		for (i = 2; i < nx-2; i++) {
-			for (j = 2; j < ny-2; j++) {
+		for (i = 3; i < nx-3; i++) {
+			for (j = 3; j < ny-3; j++) {
 				CEL(g->cons[n],i,j) = CEL(g->cons_gen[n],i,j)
 					+ xfac * (FEL(g->Jx[n],i,j) - FEL(g->Jx[n],i+1,j))
 					+ yfac * (FEL(g->Jy[n],i,j) - FEL(g->Jy[n],i,j+1))
@@ -226,8 +226,8 @@ static void add_flux_div_src(struct grid *g, int step)
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
 #endif /* _OPENMP */
-		for (i = 2; i < nx-2; i++) {
-			for (j = 2; j < ny-2; j++) {
+		for (i = 3; i < nx-3; i++) {
+			for (j = 3; j < ny-3; j++) {
 				CEL(g->s[m],i,j) = CEL(g->s_gen[m],i,j)
 					+ xfac * (FEL(g->s_Jx[m],i,j) - FEL(g->s_Jx[m],i+1,j))
 					+ yfac * (FEL(g->s_Jy[m],i,j) - FEL(g->s_Jy[m],i,j+1))

@@ -25,11 +25,13 @@ void global_const()
 	GRAV = 0;
 
 #if BINARY == 1
-	XMIN = -100;
-	XMAX = 100;
-	YMIN = -100;
-	YMAX = 100;
-	OUT_TF = 1*BIN_PERIOD;
+	double r0;
+	r0 = 2.5e10;
+	XMIN = -r0;
+	XMAX = r0;
+	YMIN = -r0;
+	YMAX = r0;
+	OUT_TF = 100*BIN_PERIOD;
 	GAMMA = 5.0/3.0;
 	GRAV = 0;
 #endif
@@ -71,6 +73,16 @@ void global_const()
 	YMAX = 0.75;
 	OUT_TF = 1.5;
 	GAMMA = 5.0/3.0;
+	GRAV = 0;
+#endif
+
+#if IMPLOSION == 1
+	XMIN = 0;
+	XMAX = 0.3;
+	YMIN = 0;
+	YMAX = 0.3;
+	OUT_TF = 2.5;
+	GAMMA = 1.4;
 	GRAV = 0;
 #endif
 
