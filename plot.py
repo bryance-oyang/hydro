@@ -91,7 +91,10 @@ def doit(fnum):
 		pl(ax, press / rho, cmap=t_cmap, vbound=[0,1.5])
 
 		ax = fig.add_subplot(gs[1,0])
-		ax.plot(xcc, rho[int(ny/2),:], "C0.-")
+		mid_rho = rho[int(ny/2),:]
+		ax.plot(xcc, mid_rho, "C0.-")
+		tv = np.sum(np.abs(mid_rho[1:] - mid_rho[:-1]))
+		ax.set_title("tv=%.16g" % tv)
 
 		ax = fig.add_subplot(gs[1,1])
 		ax.plot(xcc, vx[int(ny/2),:], "C1.-")
@@ -109,9 +112,9 @@ def doit(fnum):
 
 		t_cmap = "YlOrBr_r"
 		ax = fig.add_subplot(gs[0,1])
-		pl(ax, press * m_air / (rho * kB), cmap=t_cmap, vbound=None)
+		#pl(ax, press * m_air / (rho * kB), cmap=t_cmap, vbound=None)
 		#pl(ax, press / rho, cmap=t_cmap, vbound=[0,1.5])
-		#pl(ax, press, cmap=t_cmap, vbound=None)
+		pl(ax, press, cmap=t_cmap, vbound=[0,2.75])
 
 	gs.tight_layout(fig)
 	plt.savefig("img/img_%05d.png" % fnum)
