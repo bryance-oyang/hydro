@@ -11,27 +11,15 @@ extern double YMIN;
 extern double GAMMA;
 extern double GRAV;
 
-void init_grid(struct grid *g)
-{
+static inline void init_prim(struct grid *g) {
 	int i, j, nx, ny;
-	double x, y, dx, dy;
+	double x, y;
 
 	nx = g->nx;
 	ny = g->ny;
-	dx = g->dx;
-	dy = g->dy;
 
-	for (i = 3; i < nx-2; i++) {
-		for (j = 3; j < ny-2; j++) {
-			CEL(g->x_cc,i,j) = XMIN + (i-2.5)*dx;
-			CEL(g->y_cc,i,j) = YMIN + (j-2.5)*dy;
-			FEL(g->x_fc,i,j) = XMIN + (i-3)*dx;
-			FEL(g->y_fc,i,j) = YMIN + (j-3)*dy;
-		}
-	}
-
-	for (i = 3; i < nx-3; i++) {
-		for (j = 3; j < ny-3; j++) {
+	for (i = 0; i < nx; i++) {
+		for (j = 0; j < ny; j++) {
 			x = CEL(g->x_cc,i,j);
 			y = CEL(g->y_cc,i,j);
 
@@ -64,7 +52,7 @@ void init_grid(struct grid *g)
 					CEL(g->prim[2],i,j) = 0;
 					CEL(g->prim[3],i,j) = 2.5;
 				}
-				double pk2pk = 0.05;
+				double pk2pk = 0.01;
 				CEL(g->prim[1],i,j) += pk2pk * (double)rand() / RAND_MAX - pk2pk / 2;
 				CEL(g->prim[2],i,j) += pk2pk * (double)rand() / RAND_MAX - pk2pk / 2;
 			}
@@ -87,7 +75,7 @@ void init_grid(struct grid *g)
 			}
 
 			if (SOD_SHOCK) {
-				if (i > nx/2) {
+				if (i < nx/2) {
 					CEL(g->prim[0],i,j) = 1;
 					CEL(g->prim[1],i,j) = 0;
 					CEL(g->prim[2],i,j) = 0;
@@ -186,5 +174,75 @@ void init_grid(struct grid *g)
 
 	eos_prim_to_cons(g->prim, g->cons, nx, ny);
 }
+
+static inline void init_cons(struct grid *g) {
+	int i, j, nx, ny;
+	double x, y;
+
+	nx = g->nx;
+	ny = g->ny;
+
+	for (i = 0; i < nx; i++) {
+		for (j = 0; j < ny; j++) {
+			x = CEL(g->x_cc,i,j);
+			y = CEL(g->y_cc,i,j);
+
+			if (LINEAR_WAVE_TEST_X || LINEAR_WAVE_TEST_Y || LINEAR_WAVE_TEST_XY) {
+				double kx, ky, angle;
+				double a, wave;
+				double rho0, press0;
+
+				a = 1e-6;
+				if (LINEAR_WAVE_TEST_X) {
+					angle = 0;
+				} else if (LINEAR_WAVE_TEST_Y) {
+					angle = PI/2;
+				} else {
+					angle = PI/3;
+				}
+				kx = 2*PI*cos(angle);
+				ky = 2*PI*sin(angle);
+
+				rho0 = 1;
+				press0 = 1.0 / (GAMMA);
+				wave = a * sin(kx*x + ky*y);
+
+				CEL(g->cons[0],i,j) = rho0 + wave;
+				CEL(g->cons[1],i,j) = 0 + cos(angle) * sqrt(GAMMA * press0 / rho0) * wave;
+				CEL(g->cons[2],i,j) = 0 + sin(angle) * sqrt(GAMMA * press0 / rho0) * wave;
+				CEL(g->cons[3],i,j) = press0/(GAMMA-1) + (GAMMA * press0)/((GAMMA-1) * rho0) * wave;
+			}
+		}
+	}
+
+	eos_cons_to_prim(g->cons, g->prim, nx, ny);
+}
+
+void init_grid(struct grid *g)
+{
+	int i, j, nx, ny;
+	double dx, dy;
+
+	nx = g->nx;
+	ny = g->ny;
+	dx = g->dx;
+	dy = g->dy;
+
+	for (i = 0; i < nx; i++) {
+		for (j = 0; j < ny; j++) {
+			CEL(g->x_cc,i,j) = XMIN + (i-2.5)*dx;
+			CEL(g->y_cc,i,j) = YMIN + (j-2.5)*dy;
+			FEL(g->x_fc,i,j) = XMIN + (i-3)*dx;
+			FEL(g->y_fc,i,j) = YMIN + (j-3)*dy;
+		}
+	}
+
+	if (LINEAR_WAVE_TEST_X || LINEAR_WAVE_TEST_Y || LINEAR_WAVE_TEST_XY) {
+		init_cons(g);
+	} else {
+		init_prim(g);
+	}
+}
+
 
 #endif /* INITIAL_COND_H */

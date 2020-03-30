@@ -32,6 +32,11 @@ void boundary(struct grid *g, int step)
 		empty_boundary_right(g);
 		empty_boundary_bot(g);
 		empty_boundary_top(g);
+	} else if (LINEAR_WAVE_TEST_X || LINEAR_WAVE_TEST_Y || LINEAR_WAVE_TEST_XY) {
+		periodic_boundary_left(g);
+		periodic_boundary_right(g);
+		periodic_boundary_bot(g);
+		periodic_boundary_top(g);
 	} else {
 		reflecting_boundary_left(g);
 		reflecting_boundary_right(g);
@@ -130,6 +135,10 @@ static void compute_src(struct grid *g, int step)
 					}
 
 					a = CEL(g->src[1+dir],i,j) / CEL(g->prim[0],i,j);
+					if (a == 0) {
+						continue;
+					}
+
 					v = CEL(g->prim[1+dir],i,j);
 					sqrt_part = sqrt(2*a*ds + SQR(v));
 					trial_dt = fmin(fabs((-v - sqrt_part) / a), fabs((-v + sqrt_part) / a));

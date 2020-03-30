@@ -4,13 +4,13 @@
 
 extern double GRAV;
 
-static inline double grid_noise_lim(double r)
+static inline double i_like_grid_noise_lim(double r)
 {
 	double a, b;
 
 	if (r > 0) {
 		a = 1;
-		b = 1.36;
+		b = 2;
 		return fmax(fmin(a, b*r), fmin(a*r, b));
 	} else {
 		return 0;
@@ -25,9 +25,16 @@ static inline double vl_lim(double r)
 	return (r + fabsr) / (1 + fabsr);
 }
 
+static inline double diffuse_lim(double r)
+{
+	return fmax(0, fmin(1, r));
+}
+
 static inline double slope_lim(double r)
 {
-	if (RECONSTRUCT) {
+	if (RECONSTRUCT == 3) {
+		return i_like_grid_noise_lim(r);
+	} else if (RECONSTRUCT == 2) {
 		return vl_lim(r);
 	} else {
 		return 0;
@@ -40,6 +47,29 @@ static inline double reconstruct_dq(double Lq, double Mq, double Uq)
 		return 0;
 	} else {
 		return slope_lim((Mq - Lq) / (Uq - Mq)) * (Uq - Mq);
+	}
+}
+
+static inline double lin_interp(double x0, double x1, double y0, double y1, double x)
+{
+	return (y1 - y0) / (x1 - x0) * (x - x0) + y0;
+}
+
+static inline double reconstruct_flatten(double d1, double d2)
+{
+	double r, flatten_start_r;
+
+	flatten_start_r = 0.92;
+
+	if (d2 != 0) {
+		r = fabs(d1 / d2);
+		if (r > flatten_start_r) {
+			return fmin(1, lin_interp(flatten_start_r, 1, 0, 1, r));
+		} else {
+			return 0;
+		}
+	} else {
+		return 1;
 	}
 }
 
@@ -75,7 +105,7 @@ void reconstruct(struct grid *g, int step, int dir)
 				q3 = CEL(g->prim[n],i+di,j+dj);
 				q4 = CEL(g->prim[n],i+2*di,j+2*dj);
 
-				if (RECONSTRUCT == 3 && step == 1) {
+				if (RECONSTRUCT == 3 && (RECONSTRUCT_BOTH || step == 1)) {
 					double dq1, dq2, dq3;
 
 					dq1 = reconstruct_dq(q0, q1, q2);
@@ -98,7 +128,14 @@ void reconstruct(struct grid *g, int step, int dir)
 						qr = 3*q2 - 2*ql;
 					}
 
-				} else if (RECONSTRUCT == 2 && step == 1) {
+					if (RECONSTRUCT_FLATTEN) {
+						double f;
+
+						f = reconstruct_flatten(q3 - q1, q4 - q0);
+						ql = (1-f)*ql + f*q2;
+						qr = (1-f)*qr + f*q2;
+					}
+				} else if (RECONSTRUCT == 2 && (RECONSTRUCT_BOTH || step == 1)) {
 					double half_step;
 
 					half_step = 0.5 * reconstruct_dq(q1, q2, q3);
@@ -131,7 +168,7 @@ void reconstruct(struct grid *g, int step, int dir)
 				q3 = CEL(g->s[m],i+di,j+dj);
 				q4 = CEL(g->s[m],i+2*di,j+2*dj);
 
-				if (RECONSTRUCT == 3 && step == 1) {
+				if (RECONSTRUCT == 3 && (RECONSTRUCT_BOTH || step == 1)) {
 					double dq1, dq2, dq3;
 
 					dq1 = reconstruct_dq(q0, q1, q2);
@@ -154,7 +191,14 @@ void reconstruct(struct grid *g, int step, int dir)
 						qr = 3*q2 - 2*ql;
 					}
 
-				} else if (RECONSTRUCT == 2 && step == 1) {
+					if (RECONSTRUCT_FLATTEN) {
+						double f;
+
+						f = reconstruct_flatten(q3 - q1, q4 - q0);
+						ql = (1-f)*ql + f*q2;
+						qr = (1-f)*qr + f*q2;
+					}
+				} else if (RECONSTRUCT == 2 && (RECONSTRUCT_BOTH || step == 1)) {
 					double half_step;
 
 					half_step = 0.5 * reconstruct_dq(q1, q2, q3);

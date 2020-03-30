@@ -5,8 +5,8 @@
 #include "grid.h"
 #include <math.h>
 
-#define SATURN 1
-#define AMCVN 0
+#define SATURN 0
+#define AMCVN 1
 
 #if SATURN == 1
 #define GM1 (BIG_G * 5.683e29)
@@ -30,19 +30,19 @@
 
 #if AMCVN == 1
 #define GM1 1.027373356934356e5
-#define GM2 1.027373356934356e2
+#define GM2 1.027373356934356e4
 #define BIN_SEP 36.00280088388794
 #define RGAS 1
 
 #define BIN_ROT_FRAME 0
-#define M1_CUTOFF 10
-#define M2_CUTOFF 5
-#define BIN_DISK_R0 30
-#define BIN_DISK_CUTOFF_WIDTH 20
-#define BIN_DISK_R1 60
+#define M1_CUTOFF 1
+#define M2_CUTOFF 1
+#define BIN_DISK_R0 7
+#define BIN_DISK_CUTOFF_WIDTH 4
+#define BIN_DISK_R1 12
 #define BIN_RHO0 2
 #define BIN_ISOTHERM 1
-#define BIN_TEMP0 4
+#define BIN_TEMP0 1
 #define SPEED_LIM 500
 #endif
 

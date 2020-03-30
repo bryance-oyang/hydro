@@ -1,3 +1,6 @@
+linear_wave_test = True
+sod_shock_test = False
+
 import matplotlib
 #matplotlib.use("Agg")
 from matplotlib import pyplot as plt
@@ -66,20 +69,49 @@ def doit(fnum):
 		cbar = plt.colorbar(im, cax=cax)
 		cbar.ax.tick_params()
 
-	fig = plt.figure(figsize=(15, 7.5), dpi=72)
-	gs = gridspec.GridSpec(1, 2)
+	if linear_wave_test:
+		fig = plt.figure(figsize=(15, 7.5), dpi=72)
+		gs = gridspec.GridSpec(1, 2)
 
-	ax = fig.add_subplot(gs[0,0])
-	#pl(ax, np.log10(rho), cmap="inferno", vbound=[-8,1])
-	pl(ax, rho, cmap="YlOrRd", vbound=[0,1.25])
-	#ax.streamplot(xcc, ycc, vx, vy, color=v, cmap="gray", density=2)
-	#res_circle = plt.Circle((0, 0), 1.2e10, color="w", fill=False, linewidth=0.5)
-	#ax.add_artist(res_circle)
+		ax = fig.add_subplot(gs[0,0])
+		pl(ax, rho - 1, cmap="cividis", vbound=[-1e-6, 1e-6])
 
-	ax = fig.add_subplot(gs[0,1])
-	#pl(ax, press * m_air / (rho * kB), cmap="inferno", vbound=None)
-	pl(ax, press / rho, cmap="inferno", vbound=[0,1.5])
-	#pl(ax, press, cmap="inferno", vbound=None)
+		ax = fig.add_subplot(gs[0,1])
+		pl(ax, press - 3.0/5.0, cmap="cividis", vbound=[-1e-6, 1e-6])
+	elif sod_shock_test:
+		fig = plt.figure(figsize=(15, 15), dpi=72)
+		gs = gridspec.GridSpec(2, 2)
+
+		rho_cmap = "GnBu"
+		ax = fig.add_subplot(gs[0,0])
+		pl(ax, rho, cmap=rho_cmap, vbound=[0,2.25])
+
+		t_cmap = "YlOrBr_r"
+		ax = fig.add_subplot(gs[0,1])
+		pl(ax, press / rho, cmap=t_cmap, vbound=[0,1.5])
+
+		ax = fig.add_subplot(gs[1,0])
+		ax.plot(xcc, rho[int(ny/2),:], "C0.-")
+
+		ax = fig.add_subplot(gs[1,1])
+		ax.plot(xcc, vx[int(ny/2),:], "C1.-")
+	else:
+		fig = plt.figure(figsize=(15, 7.5), dpi=72)
+		gs = gridspec.GridSpec(1, 2)
+
+		rho_cmap = "GnBu"
+		ax = fig.add_subplot(gs[0,0])
+		#pl(ax, np.log10(rho), cmap=rho_cmap, vbound=[-8,1])
+		pl(ax, rho, cmap=rho_cmap, vbound=[0,2.25])
+		#ax.streamplot(xcc, ycc, vx, vy, color=v, cmap="gray", density=2)
+		#res_circle = plt.Circle((0, 0), 1.2e10, color="w", fill=False, linewidth=0.5)
+		#ax.add_artist(res_circle)
+
+		t_cmap = "YlOrBr_r"
+		ax = fig.add_subplot(gs[0,1])
+		#pl(ax, press * m_air / (rho * kB), cmap=t_cmap, vbound=None)
+		pl(ax, press / rho, cmap=t_cmap, vbound=[0,1.5])
+		#pl(ax, press, cmap=t_cmap, vbound=None)
 
 	gs.tight_layout(fig)
 	plt.savefig("img/img_%05d.png" % fnum)

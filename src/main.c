@@ -29,7 +29,7 @@ void output_array(char *filename, double *q, int nx, int ny)
 
 	for (i = 3; i < nx-3; i++) {
 		for (j = 3; j < ny-3; j++) {
-			fprintf(f, "%g ", CEL(q,i,j));
+			fprintf(f, "%.16e ", CEL(q,i,j));
 		}
 		fprintf(f, "\n");
 	}
@@ -51,16 +51,22 @@ void output(struct grid *g, int nout)
 
 		fprintf(f, "%d\n", NX);
 		fprintf(f, "%d\n", NY);
-		fprintf(f, "%g\n", g->dx);
-		fprintf(f, "%g\n", g->dy);
-		fprintf(f, "%g\n", XMIN);
-		fprintf(f, "%g\n", XMAX);
-		fprintf(f, "%g\n", YMIN);
-		fprintf(f, "%g\n", YMAX);
+		fprintf(f, "%.16e\n", g->dx);
+		fprintf(f, "%.16e\n", g->dy);
+		fprintf(f, "%.16e\n", XMIN);
+		fprintf(f, "%.16e\n", XMAX);
+		fprintf(f, "%.16e\n", YMIN);
+		fprintf(f, "%.16e\n", YMAX);
 		fprintf(f, "%d\n", MAX_OUT);
 
 		fclose(f);
 	}
+	sprintf(filename, "data/time.dat");
+	if ((f = fopen(filename, "a")) == NULL) {
+		fprintf(stderr, "unable to open %s\n", filename);
+		exit(EXIT_FAILURE);
+	}
+	fprintf(f, "%.16e\n", g->time);
 
 	sprintf(filename, "data/rho_%05d.dat", nout);
 	output_array(filename, g->prim[0], g->nx, g->ny);

@@ -3,29 +3,34 @@
 
 #define HLLC 1
 #define RECONSTRUCT 3
+#define RECONSTRUCT_BOTH 1
+#define RECONSTRUCT_FLATTEN 1
 #define FANCY_POT_NRG 1
-#define ROE_WAVESPEED 1
+#define ROE_WAVESPEED 0
 #define NTHREAD 4
 #define THREAD_SCHEDULE static
 
-#define NX 400
-#define NY 400
+#define NX 200
+#define NY 200
 
 #define BINARY 0
 #define KH_INSTAB 0
 #define RT_INSTAB 0
 #define SOD_SHOCK 0
-#define BLAST 0
-#define IMPLOSION 1
+#define BLAST 1
+#define IMPLOSION 0
 #define STATIC_GRAV_TEST 0
 #define SUPERSONIC 0
 #define ATMOSPHERE 0
+#define LINEAR_WAVE_TEST_X 0
+#define LINEAR_WAVE_TEST_Y 0
+#define LINEAR_WAVE_TEST_XY 0
 
 #define NSCALAR 0
 #define RHO_FLOOR 1e-8
 #define PRESS_FLOOR 1e-10
 
-#define MAX_OUT 80
+#define MAX_OUT 40
 #define MAX_EPOCH 1000000000000
 #define CFL_NUM 0.43
 
@@ -35,6 +40,7 @@
 #define BIG_G 6.67408e-8
 #define kB 1.380649e-16
 
+#define SIGN(x) (((x) > 0) - ((x) < 0))
 #define SQR(x) ((x)*(x))
 #define CUBE(x) ((x)*(x)*(x))
 #define QUAD(x) ((x)*(x)*(x)*(x))

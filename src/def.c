@@ -26,12 +26,13 @@ void global_const()
 
 #if BINARY == 1
 	double r0;
-	r0 = 2.5e10;
+	//r0 = 2.5e10;
+	r0 = 27;
 	XMIN = -r0;
 	XMAX = r0;
 	YMIN = -r0;
 	YMAX = r0;
-	OUT_TF = 100*BIN_PERIOD;
+	OUT_TF = 2*BIN_PERIOD;
 	GAMMA = 5.0/3.0;
 	GRAV = 0;
 #endif
@@ -59,11 +60,11 @@ void global_const()
 #if SOD_SHOCK == 1
 	XMIN = -0.5;
 	XMAX = 0.5;
-	YMIN = -0.75;
-	YMAX = 0.75;
-	OUT_TF = 1;
+	YMIN = -0.1;
+	YMAX = 0.1;
+	OUT_TF = 1.0;
 	GAMMA = 5.0/3.0;
-	GRAV = 0.1;
+	GRAV = 0;
 #endif
 
 #if BLAST == 1
@@ -114,6 +115,16 @@ void global_const()
 	OUT_TF = 400;
 	GAMMA = 1.4;
 	GRAV = 980;
+#endif
+
+#if LINEAR_WAVE_TEST_X == 1  || LINEAR_WAVE_TEST_Y == 1 || LINEAR_WAVE_TEST_XY == 1
+	XMIN = -2;
+	XMAX = 2;
+	YMIN = -2;
+	YMAX = 2;
+	OUT_TF = 2;
+	GAMMA = 5.0/3.0;
+	GRAV = 0;
 #endif
 
 	OUT_DT = (OUT_TF / ((MAX_OUT) - 1));
