@@ -2,7 +2,7 @@
 #define DEF_H
 
 #define HLLC 1
-#define RECONSTRUCT 3
+#define RECONSTRUCT 6
 #define RECONSTRUCT_BOTH 1
 #define RECONSTRUCT_FLATTEN 1
 #define FANCY_POT_NRG 1
@@ -10,14 +10,14 @@
 #define NTHREAD 4
 #define THREAD_SCHEDULE static
 
-#define NX 200
-#define NY 200
+#define NX 100
+#define NY 300
 
 #define BINARY 0
 #define KH_INSTAB 0
-#define RT_INSTAB 0
+#define RT_INSTAB 1
 #define SOD_SHOCK 0
-#define BLAST 1
+#define BLAST 0
 #define IMPLOSION 0
 #define STATIC_GRAV_TEST 0
 #define SUPERSONIC 0
@@ -48,8 +48,8 @@
 #define CEL(a,i,j) ((a)[(i)*ny + (j)])
 #define FEL(a,i,j) ((a)[(i)*(ny+1) + (j)])
 
-#if RECONSTRUCT != 1 && RECONSTRUCT != 2 && RECONSTRUCT != 3
-#error "RECONSTRUCT must be in {1,2,3}"
+#if RECONSTRUCT != 1 && RECONSTRUCT != 2 && RECONSTRUCT != 3 && RECONSTRUCT != 6
+#error "RECONSTRUCT must be in {1,2,3,6}"
 #endif
 
 void global_const();

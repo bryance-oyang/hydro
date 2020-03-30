@@ -30,19 +30,21 @@
 
 #if AMCVN == 1
 #define GM1 1.027373356934356e5
-#define GM2 1.027373356934356e4
-#define BIN_SEP 36.00280088388794
+//#define GM2 1.027373356934356e4
+#define GM2 0.0
+//#define BIN_SEP 36.00280088388794
+#define BIN_SEP 100
 #define RGAS 1
 
 #define BIN_ROT_FRAME 0
 #define M1_CUTOFF 1
-#define M2_CUTOFF 1
-#define BIN_DISK_R0 7
-#define BIN_DISK_CUTOFF_WIDTH 4
-#define BIN_DISK_R1 12
+#define M2_CUTOFF 0
+#define BIN_DISK_R0 40
+#define BIN_DISK_CUTOFF_WIDTH 10
+#define BIN_DISK_R1 70
 #define BIN_RHO0 2
 #define BIN_ISOTHERM 1
-#define BIN_TEMP0 1
+#define BIN_TEMP0 0
 #define SPEED_LIM 500
 #endif
 

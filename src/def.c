@@ -27,12 +27,12 @@ void global_const()
 #if BINARY == 1
 	double r0;
 	//r0 = 2.5e10;
-	r0 = 27;
+	r0 = 100;
 	XMIN = -r0;
 	XMAX = r0;
 	YMIN = -r0;
 	YMAX = r0;
-	OUT_TF = 2*BIN_PERIOD;
+	OUT_TF = 1*BIN_PERIOD;
 	GAMMA = 5.0/3.0;
 	GRAV = 0;
 #endif

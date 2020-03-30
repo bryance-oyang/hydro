@@ -105,7 +105,40 @@ void reconstruct(struct grid *g, int step, int dir)
 				q3 = CEL(g->prim[n],i+di,j+dj);
 				q4 = CEL(g->prim[n],i+2*di,j+2*dj);
 
-				if (RECONSTRUCT == 3 && (RECONSTRUCT_BOTH || step == 1)) {
+				if (RECONSTRUCT == 6 && (RECONSTRUCT_BOTH || step == 1)) {
+					double dq1, dq2, dq3;
+
+					dq1 = q2 - q0;
+					dq2 = q3 - q1;
+					dq3 = q4 - q2;
+
+					ql = 0.5*(q1 + q2) - (dq2 - dq1) / 12;
+					qr = 0.5*(q2 + q3) - (dq3 - dq2) / 12;
+
+					double dq, minq, maxq;
+
+					dq = fmax(fabs(q2 - q1), fabs(q3 - q2));
+					minq = q2 - dq;
+					maxq = q2 + dq;
+
+					ql = fmax(minq, ql);
+					ql = fmin(maxq, ql);
+					qr = fmax(minq, qr);
+					qr = fmin(maxq, qr);
+
+					double test1, test2;
+					test1 = 6*(qr - ql) * (q2 - 0.5*(ql + qr));
+					test2 = SQR(qr - ql);
+
+					if ((qr - q2) * (q2 - ql) <= 0) {
+						ql = q2;
+						qr = q2;
+					} else if (test1 > test2) {
+						ql = 3*q2 - 2*qr;
+					} else if (-test2 > test1) {
+						qr = 3*q2 - 2*ql;
+					}
+				} else if (RECONSTRUCT == 3 && (RECONSTRUCT_BOTH || step == 1)) {
 					double dq1, dq2, dq3;
 
 					dq1 = reconstruct_dq(q0, q1, q2);

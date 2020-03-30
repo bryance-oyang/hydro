@@ -1,4 +1,4 @@
-linear_wave_test = True
+linear_wave_test = False
 sod_shock_test = False
 
 import matplotlib
@@ -109,8 +109,8 @@ def doit(fnum):
 
 		t_cmap = "YlOrBr_r"
 		ax = fig.add_subplot(gs[0,1])
-		#pl(ax, press * m_air / (rho * kB), cmap=t_cmap, vbound=None)
-		pl(ax, press / rho, cmap=t_cmap, vbound=[0,1.5])
+		pl(ax, press * m_air / (rho * kB), cmap=t_cmap, vbound=None)
+		#pl(ax, press / rho, cmap=t_cmap, vbound=[0,1.5])
 		#pl(ax, press, cmap=t_cmap, vbound=None)
 
 	gs.tight_layout(fig)
