@@ -1,5 +1,12 @@
 #include "def.h"
+
+#if WIND_TUNNEL == 1
+#include "wind_tunnel.h"
+#endif
+
+#if BINARY == 1
 #include "binary.h"
+#endif
 
 double XMIN;
 double XMAX;
@@ -25,13 +32,11 @@ void global_const()
 	GRAV = 0;
 
 #if WIND_TUNNEL == 1
-	double r0;
-	r0 = 10;
-	XMIN = -r0;
-	XMAX = r0;
-	YMIN = -r0;
-	YMAX = r0;
-	OUT_TF = 100;
+	XMIN = -3;
+	XMAX = 8;
+	YMIN = -5;
+	YMAX = 5;
+	OUT_TF = 120 / WIND_SPEED;
 	GAMMA = 1.4;
 	GRAV = 0;
 #endif

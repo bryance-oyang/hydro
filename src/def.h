@@ -10,8 +10,8 @@
 #define NTHREAD 4
 #define THREAD_SCHEDULE static
 
-#define NX 200
-#define NY 200
+#define NX 300
+#define NY 300
 
 #define WIND_TUNNEL 1
 #define BINARY 0
@@ -28,10 +28,10 @@
 #define LINEAR_WAVE_TEST_XY 0
 
 #define NSCALAR 0
-#define RHO_FLOOR 1e-8
+#define RHO_FLOOR 1e-2
 #define PRESS_FLOOR 1e-10
 
-#define MAX_OUT 40
+#define MAX_OUT 120
 #define MAX_EPOCH 1000000000000
 #define CFL_NUM 0.43
 

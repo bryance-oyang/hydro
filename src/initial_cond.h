@@ -30,10 +30,8 @@ static inline void init_prim(struct grid *g) {
 			y = CEL(g->y_cc,i,j);
 
 			if (WIND_TUNNEL) {
-				double r;
-
-				r = sqrt(SQR(x) + SQR(y));
-				if (r <= 2) {
+#if WIND_TUNNEL == 1
+				if (airfoil(x, y)) {
 					CEL(g->prim[0],i,j) = 1e20;
 					CEL(g->prim[1],i,j) = 0;
 					CEL(g->prim[2],i,j) = 0;
@@ -44,6 +42,7 @@ static inline void init_prim(struct grid *g) {
 					CEL(g->prim[2],i,j) = 0;
 					CEL(g->prim[3],i,j) = 1;
 				}
+#endif
 			}
 
 			if (BINARY) {

@@ -7,7 +7,41 @@
 #include <math.h>
 
 #define SPEED_LIM 1e2
-#define PRESS_CEIL 1e2
+#define PRESS_CEIL 25
+#define WIND_SPEED 3
+
+static inline double airfoil_shape(double x)
+{
+	if (x >= 0 && x <= 1) {
+		return 0.5 * x * (2 - x);
+	} else if (x >= 1 && x <= 5) {
+		return -0.125 * (x - 5);
+	} else {
+		return 0;
+	}
+}
+
+static inline int airfoil(double x, double y)
+{
+	/*
+	if (y >= 0 && y <= airfoil_shape(x)) {
+		return 1;
+	} else {
+		return 0;
+	}
+	*/
+
+	double rx, ry, theta;
+
+	theta = PI/6;
+	rx = x*cos(theta) + y*sin(theta);
+	ry = -x*sin(theta) + y*cos(theta);
+	if (SQR(rx/2) + SQR(ry/1) <= 1) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
 
 static inline void wind_tunnel_boundary(struct grid *g)
 {
@@ -17,7 +51,7 @@ static inline void wind_tunnel_boundary(struct grid *g)
 	nx = g->nx;
 	ny = g->ny;
 
-	inflow_boundary_left(g, 1, 3, 0, 1);
+	inflow_boundary_left(g, 1, WIND_SPEED, 0, 1);
 
 #if _OPENMP
 #pragma omp parallel for simd private(j) num_threads(NTHREAD) schedule(THREAD_SCHEDULE)
