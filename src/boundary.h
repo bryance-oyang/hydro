@@ -3,6 +3,81 @@
 
 #include <math.h>
 
+static inline void inflow_boundary_left(struct grid *g, double rho, double vx, double vy, double press)
+{
+	int i, j, k;
+	int ny;
+
+	ny = g->ny;
+
+	i = 0;
+	for (k = 0; k < 3; k++) {
+		for (j = 3; j < ny-3; j++) {
+			CEL(g->prim[0],i+k,j) = rho;
+			CEL(g->prim[1],i+k,j) = vx;
+			CEL(g->prim[2],i+k,j) = vy;
+			CEL(g->prim[3],i+k,j) = press;
+		}
+	}
+}
+
+static inline void inflow_boundary_right(struct grid *g, double rho, double vx, double vy, double press)
+{
+	int i, j, k;
+	int nx, ny;
+
+	nx = g->nx;
+	ny = g->ny;
+
+	i = nx-1;
+	for (k = 0; k < 3; k++) {
+		for (j = 3; j < ny-3; j++) {
+			CEL(g->prim[0],i-k,j) = rho;
+			CEL(g->prim[1],i-k,j) = vx;
+			CEL(g->prim[2],i-k,j) = vy;
+			CEL(g->prim[3],i-k,j) = press;
+		}
+	}
+}
+
+static inline void inflow_boundary_bot(struct grid *g, double rho, double vx, double vy, double press)
+{
+	int i, j, k;
+	int nx, ny;
+
+	nx = g->nx;
+	ny = g->ny;
+
+	j = 0;
+	for (i = 3; i < nx-3; i++) {
+		for (k = 0; k < 3; k++) {
+			CEL(g->prim[0],i,j+k) = rho;
+			CEL(g->prim[1],i,j+k) = vx;
+			CEL(g->prim[2],i,j+k) = vy;
+			CEL(g->prim[3],i,j+k) = press;
+		}
+	}
+}
+
+static inline void inflow_boundary_top(struct grid *g, double rho, double vx, double vy, double press)
+{
+	int i, j, k;
+	int nx, ny;
+
+	nx = g->nx;
+	ny = g->ny;
+
+	j = ny-1;
+	for (i = 3; i < nx-3; i++) {
+		for (k = 0; k < 3; k++) {
+			CEL(g->prim[0],i,j-k) = rho;
+			CEL(g->prim[1],i,j-k) = vx;
+			CEL(g->prim[2],i,j-k) = vy;
+			CEL(g->prim[3],i,j-k) = press;
+		}
+	}
+}
+
 static inline void periodic_boundary_left(struct grid *g)
 {
 	int i, j, k, n;

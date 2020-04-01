@@ -24,6 +24,18 @@ void global_const()
 	GAMMA = 1.4;
 	GRAV = 0;
 
+#if WIND_TUNNEL == 1
+	double r0;
+	r0 = 10;
+	XMIN = -r0;
+	XMAX = r0;
+	YMIN = -r0;
+	YMAX = r0;
+	OUT_TF = 100;
+	GAMMA = 1.4;
+	GRAV = 0;
+#endif
+
 #if BINARY == 1
 	double r0;
 	//r0 = 2.5e10;
@@ -42,7 +54,7 @@ void global_const()
 	XMAX = 0.5;
 	YMIN = -0.5;
 	YMAX = 0.5;
-	OUT_TF = 5;
+	OUT_TF = 1;
 	GAMMA = 1.4;
 	GRAV = 0;
 #endif

@@ -2,9 +2,15 @@
 #include "eos.h"
 #include "riemann.h"
 #include "boundary.h"
-#include "binary.h"
 #include <float.h>
 #include <math.h>
+
+#if WIND_TUNNEL == 1
+#include "wind_tunnel.h"
+#endif
+#if BINARY == 1
+#include "binary.h"
+#endif
 
 extern double GAMMA;
 extern double GRAV;
@@ -27,7 +33,9 @@ void boundary(struct grid *g, int step)
 		reflecting_boundary_bot(g);
 		smooth_boundary_top(g);
 	} else if (BINARY) {
+#if BINARY == 1
 		binary_boundary(g, step);
+#endif
 		empty_boundary_left(g);
 		empty_boundary_right(g);
 		empty_boundary_bot(g);
@@ -37,6 +45,13 @@ void boundary(struct grid *g, int step)
 		periodic_boundary_right(g);
 		periodic_boundary_bot(g);
 		periodic_boundary_top(g);
+	} else if (WIND_TUNNEL) {
+#if WIND_TUNNEL == 1
+		wind_tunnel_boundary(g);
+#endif
+		smooth_boundary_right(g);
+		smooth_boundary_bot(g);
+		smooth_boundary_top(g);
 	} else {
 		reflecting_boundary_left(g);
 		reflecting_boundary_right(g);
@@ -47,32 +62,32 @@ void boundary(struct grid *g, int step)
 
 static double potential(double t, double x, double y)
 {
-	if (BINARY) {
-		double r, grav1, grav2, spin, r2;
+#if BINARY == 1
+	double r, grav1, grav2, spin, r2;
 
-		r = sqrt(SQR(x) + SQR(y));
-		if (r <= M1_CUTOFF) {
-			grav1 = -GM1 / M1_CUTOFF;
-		} else {
-			grav1 = -GM1 / r;
-		}
-		if (BIN_ROT_FRAME) {
-			r2 = sqrt(SQR(x - BIN_SEP*cos(BIN_ANGLE)) + SQR(y - BIN_SEP*sin(BIN_ANGLE)));
-			spin = -0.5 * (SQR(x - BIN_COM*cos(BIN_ANGLE)) + SQR(y - BIN_COM*sin(BIN_ANGLE))) * SQR(BIN_OMEGA);
-		} else {
-			r2 = sqrt(SQR(x - BIN_SEP*cos(BIN_OMEGA*t + BIN_ANGLE)) + SQR(y - BIN_SEP*sin(BIN_OMEGA*t + BIN_ANGLE)));
-			spin = 0;
-		}
-		if (r2 <= M2_CUTOFF) {
-			grav2 = -GM2 / M2_CUTOFF;
-		} else {
-			grav2 = -GM2 / r2;
-
-		}
-		return grav1 + grav2 + spin;
+	r = sqrt(SQR(x) + SQR(y));
+	if (r <= M1_CUTOFF) {
+		grav1 = -GM1 / M1_CUTOFF;
 	} else {
-		return GRAV * y;
+		grav1 = -GM1 / r;
 	}
+	if (BIN_ROT_FRAME) {
+		r2 = sqrt(SQR(x - BIN_SEP*cos(BIN_ANGLE)) + SQR(y - BIN_SEP*sin(BIN_ANGLE)));
+		spin = -0.5 * (SQR(x - BIN_COM*cos(BIN_ANGLE)) + SQR(y - BIN_COM*sin(BIN_ANGLE))) * SQR(BIN_OMEGA);
+	} else {
+		r2 = sqrt(SQR(x - BIN_SEP*cos(BIN_OMEGA*t + BIN_ANGLE)) + SQR(y - BIN_SEP*sin(BIN_OMEGA*t + BIN_ANGLE)));
+		spin = 0;
+	}
+	if (r2 <= M2_CUTOFF) {
+		grav2 = -GM2 / M2_CUTOFF;
+	} else {
+		grav2 = -GM2 / r2;
+
+	}
+	return grav1 + grav2 + spin;
+#else
+	return GRAV * y;
+#endif
 }
 
 static void compute_src(struct grid *g, int step)

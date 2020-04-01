@@ -2,19 +2,20 @@
 #define DEF_H
 
 #define HLLC 1
-#define RECONSTRUCT 3
-#define RECONSTRUCT_BOTH 1
+#define RECONSTRUCT 6
 #define RECONSTRUCT_FLATTEN 1
 #define FANCY_POT_NRG 1
+#define RECONSTRUCT_BOTH 0
 #define ROE_WAVESPEED 0
 #define NTHREAD 4
 #define THREAD_SCHEDULE static
 
-#define NX 512
-#define NY 512
+#define NX 200
+#define NY 200
 
+#define WIND_TUNNEL 1
 #define BINARY 0
-#define KH_INSTAB 1
+#define KH_INSTAB 0
 #define RT_INSTAB 0
 #define SOD_SHOCK 0
 #define BLAST 0
@@ -30,7 +31,7 @@
 #define RHO_FLOOR 1e-8
 #define PRESS_FLOOR 1e-10
 
-#define MAX_OUT 501
+#define MAX_OUT 40
 #define MAX_EPOCH 1000000000000
 #define CFL_NUM 0.43
 

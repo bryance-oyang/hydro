@@ -2,9 +2,15 @@
 #define INITIAL_COND_H
 
 #include "eos.h"
-#include "binary.h"
 #include <stdlib.h>
 #include <math.h>
+
+#if WIND_TUNNEL == 1
+#include "wind_tunnel.h"
+#endif
+#if BINARY == 1
+#include "binary.h"
+#endif
 
 extern double XMIN;
 extern double YMIN;
@@ -23,21 +29,33 @@ static inline void init_prim(struct grid *g) {
 			x = CEL(g->x_cc,i,j);
 			y = CEL(g->y_cc,i,j);
 
-			if (BINARY) {
+			if (WIND_TUNNEL) {
 				double r;
 
 				r = sqrt(SQR(x) + SQR(y));
-				if (r <= M1_CUTOFF) {
-					CEL(g->prim[0],i,j) = 10;
+				if (r <= 2) {
+					CEL(g->prim[0],i,j) = 1e20;
 					CEL(g->prim[1],i,j) = 0;
 					CEL(g->prim[2],i,j) = 0;
-					CEL(g->prim[3],i,j) = bin_press(M1_CUTOFF);
+					CEL(g->prim[3],i,j) = 1;
 				} else {
-					CEL(g->prim[0],i,j) = bin_rho(r);
-					CEL(g->prim[1],i,j) = -y/r * bin_vel(r);
-					CEL(g->prim[2],i,j) = x/r * bin_vel(r);
-					CEL(g->prim[3],i,j) = bin_press(r);
+					CEL(g->prim[0],i,j) = 1;
+					CEL(g->prim[1],i,j) = 0;
+					CEL(g->prim[2],i,j) = 0;
+					CEL(g->prim[3],i,j) = 1;
 				}
+			}
+
+			if (BINARY) {
+#if BINARY == 1
+				double r;
+
+				r = sqrt(SQR(x) + SQR(y));
+				CEL(g->prim[0],i,j) = bin_rho(r);
+				CEL(g->prim[1],i,j) = -y/r * bin_vel(r);
+				CEL(g->prim[2],i,j) = x/r * bin_vel(r);
+				CEL(g->prim[3],i,j) = bin_press(r);
+#endif
 			}
 
 			if (KH_INSTAB) {

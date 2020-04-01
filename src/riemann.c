@@ -55,6 +55,16 @@ static inline double lin_interp(double x0, double x1, double y0, double y1, doub
 	return (y1 - y0) / (x1 - x0) * (x - x0) + y0;
 }
 
+static inline double fmin3(double a, double b, double c)
+{
+	return fmin(fmin(a,b),c);
+}
+
+static inline double fmin4(double a, double b, double c, double d)
+{
+	return fmin(fmin(fmin(a,b),c),d);
+}
+
 static inline double reconstruct_flatten(double d1, double d2)
 {
 	double r, flatten_start_r;
@@ -71,6 +81,73 @@ static inline double reconstruct_flatten(double d1, double d2)
 	} else {
 		return 1;
 	}
+}
+
+static inline void fancy_ppm(double *pql, double *pqr, double q0, double q1, double q2, double q3, double q4)
+{
+	double ql, qr;
+	double curvl, curvr, curvc, curvf, curv;
+	double C;
+
+	C = 1.06;
+
+	ql = (7.0*(q1 + q2) - (q0 + q3)) / 12;
+	curvl = (q0 - 2*q1 + q2);
+	curvr = (q1 - 2*q2 + q3);
+	//curvf = 3*(q1 - 2*ql + q2);
+	curvf = 4*(q1 - 2*ql + q2);
+	if (SIGN(curvl) == SIGN(curvf) && SIGN(curvf) == SIGN(curvr)) {
+		curv = SIGN(curvf) * fmin3(C*fabs(curvl), C*fabs(curvr), fabs(curvf));
+	} else {
+		curv = 0;
+	}
+	//ql = 0.5 * (q1 + q2) - curv / 3;
+	ql = 0.5 * (q1 + q2) - curv / 6;
+
+	qr = (7.0*(q2 + q3) - (q1 + q4)) / 12;
+	curvl = (q1 - 2*q2 + q3);
+	curvr = (q2 - 2*q3 + q4);
+	//curvf = 3*(q2 - 2*qr + q3);
+	curvf = 4*(q2 - 2*qr + q3);
+	if (SIGN(curvl) == SIGN(curvf) && SIGN(curvf) == SIGN(curvr)) {
+		curv = SIGN(curvf) * fmin3(C*fabs(curvl), C*fabs(curvr), fabs(curvf));
+	} else {
+		curv = 0;
+	}
+	//qr = 0.5 * (q2 + q3) - curv / 3;
+	qr = 0.5 * (q2 + q3) - curv / 6;
+
+	double test1, test2;
+	test1 = 6*(qr - ql) * (q2 - 0.5*(ql + qr));
+	test2 = SQR(qr - ql);
+
+	if ((qr - q2) * (q2 - ql) <= 0 || (q3 - q2) * (q2 - q1) <= 0) {
+		curvc = (q1 - 2*q2 + q3);
+		curvl = (q0 - 2*q1 + q2);
+		curvr = (q2 - 2*q3 + q4);
+		//curvf = 6*(ql - 2*q2 + qr);
+		curvf = 4*(ql - 2*q2 + qr);
+		if (SIGN(curvl) == SIGN(curvc) && SIGN(curvc) == SIGN(curvr) && SIGN(curvc) == SIGN(curvf)) {
+			curv = SIGN(curvf) * fmin4(C*fabs(curvl), C*fabs(curvc), C*fabs(curvr), fabs(curvf));
+		} else {
+			curv = 0;
+		}
+
+		if (curvf != 0) {
+			ql = q2 + (ql - q2) * curv / curvf;
+			qr = q2 + (qr - q2) * curv / curvf;
+		} else {
+			ql = q2;
+			qr = q2;
+		}
+	} else if (test1 > test2) {
+		ql = 3*q2 - 2*qr;
+	} else if (-test2 > test1) {
+		qr = 3*q2 - 2*ql;
+	}
+
+	*pql = ql;
+	*pqr = qr;
 }
 
 void reconstruct(struct grid *g, int step, int dir)
@@ -106,38 +183,7 @@ void reconstruct(struct grid *g, int step, int dir)
 				q4 = CEL(g->prim[n],i+2*di,j+2*dj);
 
 				if (RECONSTRUCT == 6 && (RECONSTRUCT_BOTH || step == 1)) {
-					double dq1, dq2, dq3;
-
-					dq1 = q2 - q0;
-					dq2 = q3 - q1;
-					dq3 = q4 - q2;
-
-					ql = 0.5*(q1 + q2) - (dq2 - dq1) / 12;
-					qr = 0.5*(q2 + q3) - (dq3 - dq2) / 12;
-
-					double dq, minq, maxq;
-
-					dq = fmax(fabs(q2 - q1), fabs(q3 - q2));
-					minq = q2 - dq;
-					maxq = q2 + dq;
-
-					ql = fmax(minq, ql);
-					ql = fmin(maxq, ql);
-					qr = fmax(minq, qr);
-					qr = fmin(maxq, qr);
-
-					double test1, test2;
-					test1 = 6*(qr - ql) * (q2 - 0.5*(ql + qr));
-					test2 = SQR(qr - ql);
-
-					if ((qr - q2) * (q2 - ql) <= 0) {
-						ql = q2;
-						qr = q2;
-					} else if (test1 > test2) {
-						ql = 3*q2 - 2*qr;
-					} else if (-test2 > test1) {
-						qr = 3*q2 - 2*ql;
-					}
+					fancy_ppm(&ql, &qr, q0, q1, q2, q3, q4);
 				} else if (RECONSTRUCT == 3 && (RECONSTRUCT_BOTH || step == 1)) {
 					double dq1, dq2, dq3;
 
@@ -201,7 +247,9 @@ void reconstruct(struct grid *g, int step, int dir)
 				q3 = CEL(g->s[m],i+di,j+dj);
 				q4 = CEL(g->s[m],i+2*di,j+2*dj);
 
-				if (RECONSTRUCT == 3 && (RECONSTRUCT_BOTH || step == 1)) {
+				if (RECONSTRUCT == 6 && (RECONSTRUCT_BOTH || step == 1)) {
+					fancy_ppm(&ql, &qr, q0, q1, q2, q3, q4);
+				} else if (RECONSTRUCT == 3 && (RECONSTRUCT_BOTH || step == 1)) {
 					double dq1, dq2, dq3;
 
 					dq1 = reconstruct_dq(q0, q1, q2);
