@@ -219,18 +219,28 @@ static void add_flux_div_src(struct grid *g, int step)
 	double xfac, yfac;
 	int i, j, nx, ny;
 	int m, n;
+	double ssprk3_weight[3];
 
 	if (step == 0) {
-		dt = g->dt / 2;
+		ssprk3_weight[0] = 1;
+		ssprk3_weight[1] = 0;
+		ssprk3_weight[2] = 1;
+	} else if (step == 1) {
+		ssprk3_weight[0] = 3.0/4.0;
+		ssprk3_weight[1] = 1.0/4.0;
+		ssprk3_weight[2] = 1.0/4.0;
 	} else {
-		dt = g->dt;
+		ssprk3_weight[0] = 1.0/3.0;
+		ssprk3_weight[1] = 2.0/3.0;
+		ssprk3_weight[2] = 2.0/3.0;
 	}
 
 	nx = g->nx;
 	ny = g->ny;
 
-	xfac = dt / g->dx;
-	yfac = dt / g->dy;
+	dt = g->dt;
+	xfac = 1.0 / g->dx;
+	yfac = 1.0 / g->dy;
 
 	for (n = 0; n < 4; n++) {
 #if _OPENMP
@@ -238,10 +248,15 @@ static void add_flux_div_src(struct grid *g, int step)
 #endif /* _OPENMP */
 		for (i = 3; i < nx-3; i++) {
 			for (j = 3; j < ny-3; j++) {
-				CEL(g->cons[n],i,j) = CEL(g->cons_gen[n],i,j)
-					+ xfac * (FEL(g->Jx[n],i,j) - FEL(g->Jx[n],i+1,j))
+				double deriv;
+
+				deriv = xfac * (FEL(g->Jx[n],i,j) - FEL(g->Jx[n],i+1,j))
 					+ yfac * (FEL(g->Jy[n],i,j) - FEL(g->Jy[n],i,j+1))
-					+ dt * CEL(g->src[n],i,j);
+					+ CEL(g->src[n],i,j);
+
+				CEL(g->cons[n],i,j) = ssprk3_weight[0] * CEL(g->cons_gen[n],i,j)
+					+ ssprk3_weight[1] * CEL(g->cons[n],i,j)
+					+ ssprk3_weight[2] * deriv * dt;
 			}
 		}
 	}
@@ -252,10 +267,15 @@ static void add_flux_div_src(struct grid *g, int step)
 #endif /* _OPENMP */
 		for (i = 3; i < nx-3; i++) {
 			for (j = 3; j < ny-3; j++) {
-				CEL(g->s[m],i,j) = CEL(g->s_gen[m],i,j)
-					+ xfac * (FEL(g->s_Jx[m],i,j) - FEL(g->s_Jx[m],i+1,j))
+				double deriv;
+
+				deriv = xfac * (FEL(g->s_Jx[m],i,j) - FEL(g->s_Jx[m],i+1,j))
 					+ yfac * (FEL(g->s_Jy[m],i,j) - FEL(g->s_Jy[m],i,j+1))
-					+ dt * CEL(g->s_src[m],i,j);
+					+ CEL(g->s_src[m],i,j);
+
+				CEL(g->s[m],i,j) = ssprk3_weight[0] * CEL(g->s_gen[m],i,j)
+					+ ssprk3_weight[1] * CEL(g->s[m],i,j)
+					+ ssprk3_weight[2] * deriv * dt;
 			}
 		}
 	}
@@ -289,7 +309,7 @@ void advance_timestep(struct grid *g)
 	copy_gen(g);
 	g->dt = DBL_MAX;
 
-	for (step = 0; step < 2; step++) {
+	for (step = 0; step < 3; step++) {
 		eos_sound_speed(g);
 		compute_Jx(g, step);
 		compute_Jy(g, step);

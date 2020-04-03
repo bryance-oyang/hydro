@@ -148,12 +148,13 @@ static inline void binary_boundary(struct grid *g, int step)
 
 	if (step == 0) {
 		t = g->time;
-		dt = g->dt / 2;
+		dt = g->dt;
 	} else if (step == 1) {
+		t = g->time + g->dt;
+		dt = g->dt / 2;
+	} else {
 		t = g->time + g->dt / 2;
 		dt = g->dt;
-	} else {
-		dt = 0;
 	}
 
 #if _OPENMP

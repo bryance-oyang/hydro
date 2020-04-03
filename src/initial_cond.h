@@ -32,7 +32,7 @@ static inline void init_prim(struct grid *g) {
 			if (WIND_TUNNEL) {
 #if WIND_TUNNEL == 1
 				if (airfoil(x, y)) {
-					CEL(g->prim[0],i,j) = 1e20;
+					CEL(g->prim[0],i,j) = 1e43;
 					CEL(g->prim[1],i,j) = 0;
 					CEL(g->prim[2],i,j) = 0;
 					CEL(g->prim[3],i,j) = 1;
@@ -58,7 +58,7 @@ static inline void init_prim(struct grid *g) {
 			}
 
 			if (KH_INSTAB) {
-				if (fabs(y) > 0.25) {
+				if (fabs(y) >= 0.25) {
 					CEL(g->prim[0],i,j) = 1;
 					CEL(g->prim[1],i,j) = 0.5;
 					CEL(g->prim[2],i,j) = 0;
@@ -76,7 +76,7 @@ static inline void init_prim(struct grid *g) {
 
 			if (RT_INSTAB) {
 				double rho;
-				if (y > 0) {
+				if (y >= 0) {
 					rho = 2;
 					CEL(g->prim[0],i,j) = rho;
 					CEL(g->prim[1],i,j) = 0;
@@ -92,7 +92,7 @@ static inline void init_prim(struct grid *g) {
 			}
 
 			if (SOD_SHOCK) {
-				if (i < nx/2) {
+				if (i <= nx/2) {
 					CEL(g->prim[0],i,j) = 1;
 					CEL(g->prim[1],i,j) = 0;
 					CEL(g->prim[2],i,j) = 0;
@@ -108,7 +108,7 @@ static inline void init_prim(struct grid *g) {
 			if (BLAST) {
 				double r;
 				r = sqrt(SQR(x) + SQR(y));
-				if (r < 0.1) {
+				if (r <= 0.1) {
 					CEL(g->prim[0],i,j) = 1;
 					CEL(g->prim[1],i,j) = 0;
 					CEL(g->prim[2],i,j) = 0;
@@ -122,7 +122,7 @@ static inline void init_prim(struct grid *g) {
 			}
 
 			if (IMPLOSION) {
-				if (x + y > 0.15) {
+				if (x + y >= 0.15) {
 					CEL(g->prim[0],i,j) = 1;
 					CEL(g->prim[1],i,j) = 0;
 					CEL(g->prim[2],i,j) = 0;
@@ -154,7 +154,7 @@ static inline void init_prim(struct grid *g) {
 			if (SUPERSONIC) {
 				double rho;
 				rho = 1;
-				if (fabs(x) < 0.1 && fabs(y) < 0.1) {
+				if (fabs(x) <= 0.1 && fabs(y) <= 0.1) {
 					CEL(g->prim[0],i,j) = 2;
 					CEL(g->prim[1],i,j) = 5;
 					CEL(g->prim[2],i,j) = -2;
@@ -180,7 +180,7 @@ static inline void init_prim(struct grid *g) {
 				CEL(g->prim[0],i,j) = rho;
 				CEL(g->prim[1],i,j) = 0;
 				CEL(g->prim[2],i,j) = 0;
-				if (r < R0) {
+				if (r <= R0) {
 					CEL(g->prim[3],i,j) = ndens * kB * 270 + (GAMMA - 1) * nrg0 / (PI * SQR(R0));
 				} else {
 					CEL(g->prim[3],i,j) = ndens * kB * 270;

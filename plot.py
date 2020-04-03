@@ -104,10 +104,10 @@ def doit(fnum):
 
 		rho_cmap = "GnBu"
 		ax = fig.add_subplot(gs[0,0])
-		pl(ax, rho, cmap=rho_cmap, vbound=[0,10])
+		pl(ax, rho, cmap=rho_cmap, vbound=[0,2.5])
 		#pl(ax, rho, cmap=rho_cmap, vbound=[0,2.25])
 		#pl(ax, np.log10(rho), cmap=rho_cmap, vbound=[-8,1])
-		ax.streamplot(xcc, ycc, vx, vy, color=v, cmap="gray", density=3)
+		#ax.streamplot(xcc, ycc, vx, vy, color=v, cmap="gray", density=3)
 		#res_circle = plt.Circle((0, 0), 1.2e10, color="w", fill=False, linewidth=0.5)
 		#ax.add_artist(res_circle)
 
@@ -115,7 +115,7 @@ def doit(fnum):
 		ax = fig.add_subplot(gs[0,1])
 		#pl(ax, press * m_air / (rho * kB), cmap=t_cmap, vbound=None)
 		#pl(ax, press / rho, cmap=t_cmap, vbound=[0,1.5])
-		pl(ax, press, cmap=t_cmap, vbound=[0,10])
+		pl(ax, press, cmap=t_cmap, vbound=[0,2.5])
 		#pl(ax, press, cmap=t_cmap, vbound=[0,2.75])
 
 	gs.tight_layout(fig)

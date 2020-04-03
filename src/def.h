@@ -5,20 +5,20 @@
 #define RECONSTRUCT 6
 #define RECONSTRUCT_FLATTEN 1
 #define FANCY_POT_NRG 1
-#define RECONSTRUCT_BOTH 0
+#define RECONSTRUCT_MIDDLE 1
 #define ROE_WAVESPEED 0
 #define NTHREAD 4
 #define THREAD_SCHEDULE static
 
-#define NX 300
-#define NY 300
+#define NX 200
+#define NY 200
 
-#define WIND_TUNNEL 1
+#define WIND_TUNNEL 0
 #define BINARY 0
 #define KH_INSTAB 0
 #define RT_INSTAB 0
 #define SOD_SHOCK 0
-#define BLAST 0
+#define BLAST 1
 #define IMPLOSION 0
 #define STATIC_GRAV_TEST 0
 #define SUPERSONIC 0
