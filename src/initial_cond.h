@@ -1,6 +1,7 @@
 #ifndef INITIAL_COND_H
 #define INITIAL_COND_H
 
+#include "emalloc.h"
 #include "eos.h"
 #include <stdlib.h>
 #include <math.h>
@@ -192,7 +193,8 @@ static inline void init_prim(struct grid *g) {
 	eos_prim_to_cons(g->prim, g->cons, nx, ny);
 }
 
-static inline void init_cons(struct grid *g) {
+void lin_wave(struct grid *g, double **cons)
+{
 	int i, j, nx, ny;
 	double x, y;
 
@@ -224,12 +226,37 @@ static inline void init_cons(struct grid *g) {
 				press0 = 1.0 / (GAMMA);
 				wave = a * sin(kx*x + ky*y);
 
-				CEL(g->cons[0],i,j) = rho0 + wave;
-				CEL(g->cons[1],i,j) = 0 + cos(angle) * sqrt(GAMMA * press0 / rho0) * wave;
-				CEL(g->cons[2],i,j) = 0 + sin(angle) * sqrt(GAMMA * press0 / rho0) * wave;
-				CEL(g->cons[3],i,j) = press0/(GAMMA-1) + (GAMMA * press0)/((GAMMA-1) * rho0) * wave;
+				CEL(cons[0],i,j) = rho0 + wave;
+				CEL(cons[1],i,j) = 0 + cos(angle) * sqrt(GAMMA * press0 / rho0) * wave;
+				CEL(cons[2],i,j) = 0 + sin(angle) * sqrt(GAMMA * press0 / rho0) * wave;
+				CEL(cons[3],i,j) = press0/(GAMMA-1) + (GAMMA * press0)/((GAMMA-1) * rho0) * wave;
 			}
 		}
+	}
+}
+
+static inline void init_cons(struct grid *g) {
+	int i, j, nx, ny;
+	double x, y;
+
+	nx = g->nx;
+	ny = g->ny;
+
+	if (LINEAR_WAVE_TEST_X || LINEAR_WAVE_TEST_Y || LINEAR_WAVE_TEST_XY) {
+		lin_wave(g, g->cons);
+	} else {
+		for (i = 0; i < nx; i++) {
+			for (j = 0; j < ny; j++) {
+				x = CEL(g->x_cc,i,j);
+				y = CEL(g->y_cc,i,j);
+
+				CEL(g->cons[0],i,j) = 1;
+				CEL(g->cons[1],i,j) = x;
+				CEL(g->cons[2],i,j) = y;
+				CEL(g->cons[3],i,j) = 1;
+			}
+		}
+
 	}
 
 	eos_cons_to_prim(g->cons, g->prim, nx, ny);

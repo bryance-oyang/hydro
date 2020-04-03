@@ -48,10 +48,10 @@ void boundary(struct grid *g, int step)
 	} else if (WIND_TUNNEL) {
 #if WIND_TUNNEL == 1
 		wind_tunnel_boundary(g);
-#endif
 		smooth_boundary_right(g);
 		smooth_boundary_bot(g);
 		smooth_boundary_top(g);
+#endif
 	} else {
 		reflecting_boundary_left(g);
 		reflecting_boundary_right(g);
@@ -97,7 +97,14 @@ static void compute_src(struct grid *g, int step)
 	double dx, dy;
 	double t;
 
-	t = g->time + step * g->dt / 2;
+	if (step == 0) {
+		t = g->time;
+	} else if (step == 1) {
+		t = g->time + g->dt;
+	} else {
+		t = g->time + g->dt / 2;
+	}
+
 	nx = g->nx;
 	ny = g->ny;
 	dx = g->dx;
@@ -316,6 +323,11 @@ void advance_timestep(struct grid *g)
 		compute_src(g, step);
 		if (step == 0) {
 			g->dt *= CFL_NUM;
+		}
+		if (LINEAR_WAVE_TEST_X && step == 0) {
+			if (g->time < 1 && g->time + g->dt > 1) {
+				g->dt = 1 - g->time;
+			}
 		}
 		add_flux_div_src(g, step);
 		eos_cons_to_prim(g->cons, g->prim, g->nx, g->ny);

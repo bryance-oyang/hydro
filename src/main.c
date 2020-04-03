@@ -81,11 +81,60 @@ void output(struct grid *g, int nout)
 	output_array(filename, g->prim[3], g->nx, g->ny);
 }
 
+void test_lin_wave(struct grid *g)
+{
+	int i, j, nx, ny, n;
+	double x, y, dx, dy;
+	double *orig_cons[4];
+	double error[4];
+	char filename[BUF_LEN];
+	FILE *f;
+
+	nx = g->nx;
+	ny = g->ny;
+	dx = g->dx;
+	dy = g->dy;
+
+	for (n = 0; n < 4; n++) {
+		orig_cons[n] = emalloc(nx*ny*sizeof(*orig_cons[n]));
+	}
+	lin_wave(g, orig_cons);
+
+	sprintf(filename, "data/lin_wave.dat");
+	if ((f = fopen(filename, "w")) == NULL) {
+		fprintf(stderr, "unable to open %s\n", filename);
+		exit(EXIT_FAILURE);
+	}
+	fprintf(f, "%d x %d\n", NX, NY);
+	fprintf(f, "t = %.16e\n", g->time);
+	for (n = 0; n < 4; n++) {
+		error[n] = 0;
+		for (i = 0; i < nx; i++) {
+			for (j = 0; j < ny; j++) {
+				x = CEL(g->x_cc,i,j);
+				y = CEL(g->y_cc,i,j);
+
+				if (x >= 0 && x <= 1 && y >= -0.5 && y <= 0.5) {
+					error[n] += dx*dy*fabs(CEL(orig_cons[n],i,j) - CEL(g->cons[n],i,j));
+				}
+			}
+		}
+		fprintf(f, "%.16e\n", error[n]);
+	}
+
+	fclose(f);
+
+	for (i = 0; i < 4; i++) {
+		free(orig_cons[i]);
+	}
+}
+
 int main()
 {
 	long epoch, nout;
 	double out_time;
 	struct grid *g;
+	int lin_wave_tested;
 
 #ifdef CDEBUG
 	feenableexcept(FE_INVALID | FE_OVERFLOW | FE_DIVBYZERO);
@@ -99,8 +148,13 @@ int main()
 
 	nout = 0;
 	out_time = 0;
+	lin_wave_tested = 0;
 	for (epoch = 0; epoch < MAX_EPOCH; epoch++) {
 		printf("t = %.3e\tdt = %.3e\t%.2f%%\n", g->time, g->dt, 100*g->time/OUT_TF);
+		if (LINEAR_WAVE_TEST_X == 1 && lin_wave_tested == 0 && g->time >= 1) {
+			test_lin_wave(g);
+			lin_wave_tested = 1;
+		}
 		if (g->time >= out_time) {
 			output(g, nout);
 			out_time = g->time + OUT_DT;

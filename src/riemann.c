@@ -182,9 +182,9 @@ void reconstruct(struct grid *g, int step, int dir)
 				q3 = CEL(g->prim[n],i+di,j+dj);
 				q4 = CEL(g->prim[n],i+2*di,j+2*dj);
 
-				if (RECONSTRUCT == 6 && (RECONSTRUCT_MIDDLE || step == 1 || step == 2)) {
+				if (RECONSTRUCT == 6) {
 					fancy_ppm(&ql, &qr, q0, q1, q2, q3, q4);
-				} else if (RECONSTRUCT == 3 && (RECONSTRUCT_MIDDLE || step == 1 || step == 2)) {
+				} else if (RECONSTRUCT == 3) {
 					double dq1, dq2, dq3;
 
 					dq1 = reconstruct_dq(q0, q1, q2);
@@ -214,7 +214,7 @@ void reconstruct(struct grid *g, int step, int dir)
 						ql = (1-f)*ql + f*q2;
 						qr = (1-f)*qr + f*q2;
 					}
-				} else if (RECONSTRUCT == 2 && (RECONSTRUCT_MIDDLE || step == 1 || step == 2)) {
+				} else if (RECONSTRUCT == 2) {
 					double half_step;
 
 					half_step = 0.5 * reconstruct_dq(q1, q2, q3);
@@ -247,9 +247,9 @@ void reconstruct(struct grid *g, int step, int dir)
 				q3 = CEL(g->s[m],i+di,j+dj);
 				q4 = CEL(g->s[m],i+2*di,j+2*dj);
 
-				if (RECONSTRUCT == 6 && (RECONSTRUCT_MIDDLE || step == 1 || step == 2)) {
+				if (RECONSTRUCT == 6) {
 					fancy_ppm(&ql, &qr, q0, q1, q2, q3, q4);
-				} else if (RECONSTRUCT == 3 && (RECONSTRUCT_MIDDLE || step == 1 || step == 2)) {
+				} else if (RECONSTRUCT == 3) {
 					double dq1, dq2, dq3;
 
 					dq1 = reconstruct_dq(q0, q1, q2);
@@ -279,7 +279,7 @@ void reconstruct(struct grid *g, int step, int dir)
 						ql = (1-f)*ql + f*q2;
 						qr = (1-f)*qr + f*q2;
 					}
-				} else if (RECONSTRUCT == 2 && (RECONSTRUCT_MIDDLE || step == 1 || step == 2)) {
+				} else if (RECONSTRUCT == 2) {
 					double half_step;
 
 					half_step = 0.5 * reconstruct_dq(q1, q2, q3);

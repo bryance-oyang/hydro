@@ -1,4 +1,4 @@
-linear_wave_test = False
+linear_wave_test = True
 sod_shock_test = False
 
 import matplotlib
@@ -82,11 +82,11 @@ def doit(fnum):
 		fig = plt.figure(figsize=(15, 15), dpi=72)
 		gs = gridspec.GridSpec(2, 2)
 
-		rho_cmap = "GnBu_r"
+		rho_cmap = "GnBu"
 		ax = fig.add_subplot(gs[0,0])
 		pl(ax, rho, cmap=rho_cmap, vbound=[0,2.25])
 
-		t_cmap = "YlOrBr_r"
+		t_cmap = "YlOrBr"
 		ax = fig.add_subplot(gs[0,1])
 		pl(ax, press / rho, cmap=t_cmap, vbound=[0,1.5])
 
