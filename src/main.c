@@ -84,7 +84,7 @@ void output(struct grid *g, int nout)
 void test_lin_wave(struct grid *g)
 {
 	int i, j, nx, ny, n;
-	double x, y, dx, dy;
+	double dx;
 	double *orig_cons[4];
 	double error[4];
 	char filename[BUF_LEN];
@@ -93,7 +93,6 @@ void test_lin_wave(struct grid *g)
 	nx = g->nx;
 	ny = g->ny;
 	dx = g->dx;
-	dy = g->dy;
 
 	for (n = 0; n < 4; n++) {
 		orig_cons[n] = emalloc(nx*ny*sizeof(*orig_cons[n]));
@@ -110,14 +109,8 @@ void test_lin_wave(struct grid *g)
 	for (n = 0; n < 4; n++) {
 		error[n] = 0;
 		for (i = 0; i < nx; i++) {
-			for (j = 0; j < ny; j++) {
-				x = CEL(g->x_cc,i,j);
-				y = CEL(g->y_cc,i,j);
-
-				if (x >= 0 && x <= 1 && y >= -0.5 && y <= 0.5) {
-					error[n] += dx*dy*fabs(CEL(orig_cons[n],i,j) - CEL(g->cons[n],i,j));
-				}
-			}
+			j = ny/2;
+			error[n] += dx*fabs(CEL(orig_cons[n],i,j) - CEL(g->cons[n],i,j));
 		}
 		fprintf(f, "%.16e\n", error[n]);
 	}

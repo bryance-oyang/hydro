@@ -227,8 +227,11 @@ void lin_wave(struct grid *g, double **cons)
 				wave = a * sin(kx*x + ky*y);
 
 				CEL(cons[0],i,j) = rho0 + wave;
-				CEL(cons[1],i,j) = 0 + cos(angle) * sqrt(GAMMA * press0 / rho0) * wave;
-				CEL(cons[2],i,j) = 0 + sin(angle) * sqrt(GAMMA * press0 / rho0) * wave;
+				CEL(cons[1],i,j) = cos(angle) * sqrt(GAMMA * press0 / rho0) * wave;
+				CEL(cons[2],i,j) = sin(angle) * sqrt(GAMMA * press0 / rho0) * wave;
+				if (LINEAR_WAVE_TEST_X) {
+					CEL(cons[2],i,j) = 0 + sqrt(GAMMA * press0 / rho0) * wave;
+				}
 				CEL(cons[3],i,j) = press0/(GAMMA-1) + (GAMMA * press0)/((GAMMA-1) * rho0) * wave;
 			}
 		}

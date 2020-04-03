@@ -3,14 +3,14 @@
 
 #define HLLC 1
 #define RECONSTRUCT 6
-#define RECONSTRUCT_FLATTEN 1
+#define RECONSTRUCT_FLATTEN 0
 #define FANCY_POT_NRG 1
 #define ROE_WAVESPEED 0
 #define NTHREAD 4
 #define THREAD_SCHEDULE static
 
-#define NX 1000
-#define NY 64
+#define NX 100
+#define NY 100
 
 #define WIND_TUNNEL 0
 #define BINARY 0

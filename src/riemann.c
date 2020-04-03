@@ -33,7 +33,7 @@ static inline double diffuse_lim(double r)
 static inline double slope_lim(double r)
 {
 	if (RECONSTRUCT == 3) {
-		return i_like_grid_noise_lim(r);
+		return vl_lim(r);
 	} else if (RECONSTRUCT == 2) {
 		return vl_lim(r);
 	} else {

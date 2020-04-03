@@ -135,11 +135,11 @@ void global_const()
 #endif
 
 #if LINEAR_WAVE_TEST_X == 1  || LINEAR_WAVE_TEST_Y == 1 || LINEAR_WAVE_TEST_XY == 1
-	XMIN = -2;
-	XMAX = 2;
-	YMIN = -2;
-	YMAX = 2;
-	OUT_TF = 2;
+	XMIN = 0;
+	XMAX = 1;
+	YMIN = 0;
+	YMAX = 1;
+	OUT_TF = 1.1;
 	GAMMA = 5.0/3.0;
 	GRAV = 0;
 #endif
