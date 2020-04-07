@@ -94,27 +94,23 @@ static inline void fancy_ppm(double *pql, double *pqr, double q0, double q1, dou
 	ql = (7.0*(q1 + q2) - (q0 + q3)) / 12;
 	curvl = (q0 - 2*q1 + q2);
 	curvr = (q1 - 2*q2 + q3);
-	//curvf = 3*(q1 - 2*ql + q2);
-	curvf = 4*(q1 - 2*ql + q2);
+	curvf = 3*(q1 - 2*ql + q2);
 	if (SIGN(curvl) == SIGN(curvf) && SIGN(curvf) == SIGN(curvr)) {
 		curv = SIGN(curvf) * fmin3(C*fabs(curvl), C*fabs(curvr), fabs(curvf));
 	} else {
 		curv = 0;
 	}
-	//ql = 0.5 * (q1 + q2) - curv / 3;
 	ql = 0.5 * (q1 + q2) - curv / 6;
 
 	qr = (7.0*(q2 + q3) - (q1 + q4)) / 12;
 	curvl = (q1 - 2*q2 + q3);
 	curvr = (q2 - 2*q3 + q4);
-	//curvf = 3*(q2 - 2*qr + q3);
-	curvf = 4*(q2 - 2*qr + q3);
+	curvf = 3*(q2 - 2*qr + q3);
 	if (SIGN(curvl) == SIGN(curvf) && SIGN(curvf) == SIGN(curvr)) {
 		curv = SIGN(curvf) * fmin3(C*fabs(curvl), C*fabs(curvr), fabs(curvf));
 	} else {
 		curv = 0;
 	}
-	//qr = 0.5 * (q2 + q3) - curv / 3;
 	qr = 0.5 * (q2 + q3) - curv / 6;
 
 	double test1, test2;
@@ -125,8 +121,7 @@ static inline void fancy_ppm(double *pql, double *pqr, double q0, double q1, dou
 		curvc = (q1 - 2*q2 + q3);
 		curvl = (q0 - 2*q1 + q2);
 		curvr = (q2 - 2*q3 + q4);
-		//curvf = 6*(ql - 2*q2 + qr);
-		curvf = 4*(ql - 2*q2 + qr);
+		curvf = 6*(ql - 2*q2 + qr);
 		if (SIGN(curvl) == SIGN(curvc) && SIGN(curvc) == SIGN(curvr) && SIGN(curvc) == SIGN(curvf)) {
 			curv = SIGN(curvf) * fmin4(C*fabs(curvl), C*fabs(curvc), C*fabs(curvr), fabs(curvf));
 		} else {

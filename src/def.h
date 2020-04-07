@@ -17,12 +17,12 @@
 #define KH_INSTAB 0
 #define RT_INSTAB 0
 #define SOD_SHOCK 0
-#define BLAST 0
+#define BLAST 1
 #define IMPLOSION 0
 #define STATIC_GRAV_TEST 0
 #define SUPERSONIC 0
 #define ATMOSPHERE 0
-#define LINEAR_WAVE_TEST_X 1
+#define LINEAR_WAVE_TEST_X 0
 #define LINEAR_WAVE_TEST_Y 0
 #define LINEAR_WAVE_TEST_XY 0
 
